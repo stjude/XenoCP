@@ -1,0 +1,1 @@
+include 'common-java-genome', 'common-java-sam', 'tools-sam', 'util-java', 'xenocp'
