@@ -2,9 +2,11 @@
 
 XenoCP is a cloud-based tool for cleansing mouse reads in xenograft BAMs. XenoCP can be easily incorporated into any workflow as it takes a BAM file
 as input and efficiently cleans up the mouse contamination and gives a clean human BAM output that could be used for downstream
-genomic analysis. St. Jude cloud version is available at: url?.
+genomic analysis. 
 
-Workflow image here?
+St. Jude cloud version
+
+Workflow image here
 
 ## Prerequisites
 
