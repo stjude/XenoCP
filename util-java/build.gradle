@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'commons-cli:commons-cli:1.2'
+    testCompile 'junit:junit:4.10'
+}
+
+group = 'org.stjude.compbio.util'
+version = '1.0'
+description = 'util-java'
+sourceCompatibility = '1.8'

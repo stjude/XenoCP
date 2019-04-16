@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+application {
+    mainClassName = 'org.stjude.compbio.xenocp.CreateContamLists'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.github.broadinstitute:picard:2.6.0'
+    compile 'commons-cli:commons-cli:1.2'
+
+    compile project(':common-java-genome')
+    compile project(':common-java-sam')
+    compile project(':util-java')
+
+    testCompile 'junit:junit:4.10'
+}
+
+group = 'org.stjude.compbio.xenocp'
+version = '2.6.0'
+description = 'xenocp'
+sourceCompatibility = '1.8'
