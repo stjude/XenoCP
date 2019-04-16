@@ -13,7 +13,7 @@ Workflow image here
   * [bwa] =0.7.13
   * [gawk]*
   * [Java SE Development Kit] ~1.8
-    * [Gradle] ~5.3.1
+    * [Gradle] ~5.3
   * [Node.js] ~10.15.3
   * [Picard] =2.6.0
   * [Python] ~3.6.1
