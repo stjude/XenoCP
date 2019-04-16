@@ -14,6 +14,6 @@ ax = sns.catplot(x='Status', y='FPKM', hue='Type', kind='box', height=5, aspect=
                  data=before_after_cleaning, legend=False)
 plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
-#plt.title('H3F3A Expression')
-plt.show()
-#plt.savefig('../data/qRT-PCR.png')
+#plt.title('H3F3A FPKM Comparison')
+#plt.show()
+plt.savefig('../data/noclean_vs_clean.png', dpi=1000, bbox_inches="tight")
