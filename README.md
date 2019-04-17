@@ -64,7 +64,7 @@ ref_db_prefix: /references/ref.fa
 ```
 
 `input_bam` is the input sample BAM; and `ref_db_prefix`, the basename of the
-input reference assembly. For example, a prefix of `MGSCv37.fa` would assume
+input human reference assembly. For example, a prefix of `MGSCv37.fa` would assume
 the following files in the same directory exist: `MGSCv37.fa`,
 `MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, `MGSCv37.fa.dict`,
 `MGSCv37.fa.fai`, `MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
