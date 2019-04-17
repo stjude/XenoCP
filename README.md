@@ -8,7 +8,7 @@ St. Jude cloud version
 
 XenoCP workflow:
 <!--![Alt text](images/xenocp_workflow2.png) -->
-<img src="images/xenocp_workflow2.png" width="48">
+<img src="images/xenocp_workflow2.png" width="100">
 
 ## Prerequisites
 
