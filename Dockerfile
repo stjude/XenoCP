@@ -32,10 +32,10 @@ RUN cd /tmp \
     && make install
 
 RUN cd /tmp \
-    && wget https://services.gradle.org/distributions/gradle-5.3.1-bin.zip \
-    && echo "1c59a17a054e9c82f0dd881871c9646e943ec4c71dd52ebc6137d17f82337436 *gradle-5.3.1-bin.zip" | sha256sum --check \
-    && unzip gradle-5.3.1-bin.zip \
-    && mv gradle-5.3.1 /opt/gradle
+    && wget https://services.gradle.org/distributions/gradle-5.4-bin.zip \
+    && echo "c8c17574245ecee9ed7fe4f6b593b696d1692d1adbfef425bef9b333e3a0e8de *gradle-5.4-bin.zip" | sha256sum --check \
+    && unzip gradle-5.4-bin.zip \
+    && mv gradle-5.4 /opt/gradle
 
 RUN mkdir -p /opt/picard/lib \
     && cd /opt/picard/lib \
