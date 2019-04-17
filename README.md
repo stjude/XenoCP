@@ -79,6 +79,15 @@ output_extension: bam
 sort_order: queryname
 ```
 
+### Create Reference Files
+
+Download the FASTA file for your genome assembly and run the following commands to create other files:
+```
+$ samtools faidx $FASTA
+$ java picard.cmdline.PicardCommandLine CreateSequenceDictionary REFERENCE=$FASTA OUTPUT=$FASTA.dict
+$ bwa index -p $FASTA $FASTA
+```
+
 [CWL inputs]: https://www.commonwl.org/user_guide/02-1st-example/index.html
 
 ## Docker
