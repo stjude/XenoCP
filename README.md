@@ -6,7 +6,9 @@ genomic analysis.
 
 St. Jude cloud version
 
-Workflow image here
+XenoCP workflow:
+<!--![Alt text](images/xenocp_workflow2.png) -->
+<img src="images/xenocp_workflow2.png" width="500">
 
 ## Prerequisites
 
