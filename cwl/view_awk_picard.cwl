@@ -57,7 +57,7 @@ doc: |
     $2 = output fastq file
 
 $namespaces:
-  s: http://schema.org
+  s: http://schema.org/
 
 $schemas:
  - https://schema.org/docs/schema_org_rdfa.html

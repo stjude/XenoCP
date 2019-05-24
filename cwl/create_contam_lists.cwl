@@ -86,7 +86,7 @@ doc: |
     -V <arg>   validation stringency: STRICT, LENIENT, or SILENT (default: SILENT)
 
 $namespaces:
-  s: http://schema.org
+  s: http://schema.org/
 
 $schemas:
  - https://schema.org/docs/schema_org_rdfa.html
