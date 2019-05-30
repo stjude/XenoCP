@@ -51,7 +51,7 @@ fi
 # Do the merge
 INPUT_ARGS=
 for INPUT in $INPUTS; do INPUT_ARGS="$INPUT_ARGS INPUT=$INPUT"; done
-cmd="java-settmp.sh $SCRATCH_DIR picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
+cmd="java.sh picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
 date
 echo $cmd
 if ! $cmd
@@ -63,7 +63,7 @@ if [ $NO_MARKDUP ]
 then
   echo "Skipping MarkDuplicates because $NO_MARKDUP was specified"
 else
-  cmd="java-settmp.sh $SCRATCH_DIR -Xmx8g picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
+  cmd="java.sh  -Xmx8g picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
   date
   echo $cmd
   if ! $cmd
