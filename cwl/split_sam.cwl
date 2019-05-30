@@ -21,7 +21,7 @@ inputs:
     inputBinding:
       position: 6
       prefix: --add-unique-rgid-to-records
-  num_backet:
+  num_bucket:
     type: int?
     inputBinding:
       position: 4

@@ -22,7 +22,7 @@ inputs:
   keep_mates_together:
     type: boolean?
     default: True
-  num_backet:
+  num_bucket:
     type: int?
     default: 11
   validation_stringency:
@@ -64,7 +64,7 @@ steps:
     in:
       input_sam_file: input_bam
       keep_mates_together: keep_mates_together
-      num_backet: num_backet
+      num_bucket: num_bucket
       validation_stringency: validation_stringency
       output_prefix: output_prefix
       output_extension: output_extension
