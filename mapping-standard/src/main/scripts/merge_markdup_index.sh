@@ -39,7 +39,7 @@ FLAGSTAT=$OUT_DIR/$bn.flagstat.txt
 MARKDUP_METRICS=$OUT_DIR/$bn.markdup.txt
 
 # Create scratch dir
-SCRATCH_DIR=`mktemp -d --tmpdir`
+SCRATCH_DIR=`mktemp -d`
 
 # Get local output locations
 L_OUTPUT=$SCRATCH_DIR/$bn.bam
