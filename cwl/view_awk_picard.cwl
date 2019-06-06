@@ -50,7 +50,7 @@ s:author:
 
 doc: |
   view_awk_picard.sh
-    A wapper of samtools view, sam_to_single.awk and picard SamToFastq for XenoCP pipeline to
+    A wrapper of samtools view, sam_to_single.awk and picard SamToFastq for XenoCP pipeline to
     extract mapped reads and convert to fastq.
     Parameters:
     $1 = input aligned bam file
