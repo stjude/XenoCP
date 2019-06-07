@@ -7,7 +7,7 @@ baseCommand: view_awk_picard.sh
 hints:
   SoftwareRequirement:
     packages:
-      sort_flagstat:
+      sort_flagstat: 
         specs: ["sam_to_single.awk"]
       picard:
         specs: ["picard.cmdline.PicardCommandLine SamToFastq"]
@@ -33,8 +33,9 @@ inputs:
 outputs:
   fastq:
     type: File
+    streamable: true
     outputBinding:
-      glob: $(inputs.output_fastq)
+      glob: $(inputs.output_fastq).gz
 
 s:author:
   class: s:Person
