@@ -51,7 +51,7 @@ fi
 # Do the merge
 INPUT_ARGS=
 for INPUT in $INPUTS; do INPUT_ARGS="$INPUT_ARGS INPUT=$INPUT"; done
-cmd="java.sh picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
+cmd="java.sh picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true USE_THREADING=true"
 date
 echo $cmd
 if ! $cmd
