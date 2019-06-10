@@ -52,11 +52,14 @@ outputs:
     outputSource: contamination/output_tie_bam
 
 steps:
+  # Step01: extract chromosome information from input bam
   get_chroms: 
     in: 
       bam: bam
     out: [chroms]
     run: get_chroms.cwl  
+
+  # Step02a: extract reads with mates that map to different chromosomes
   mismatch: 
     in:
       bam: bam
@@ -77,6 +80,8 @@ steps:
           outputBinding: 
             glob: "*.bam"
       baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam] 
+
+  # Step02b: extract reads mapped to each chromosome
   by_chrom:
     in:
       chroms:  
@@ -86,7 +91,6 @@ steps:
     scatter: chroms
     run:
       class: CommandLineTool
-      #stdout: $(inputs.chroms).bam
       inputs:
         chroms:
           type: string
@@ -105,19 +109,8 @@ steps:
          outputBinding: 
            glob: "$(inputs.chroms).bam"
       baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam]
-#  sort:
-#    run: sort_flagstat.cwl
-#    in:
-#      input_bam: #[step1/out_bam, step2/out_bam]
-#        source: [mismatch/out_bam, by_chrom/out_bam]
-#        linkMerge: merge_flattened
-#      sort_order:
-#        default: queryname
-#      output_bam:
-#        valueFrom: $(inputs.input_bam.basename)   # here "inputs" refers to inputs in sort_flagstat.cwl
-#    scatter: [input_bam]
-#    out: [sort_bam, flagstat]
-   # Step03: extract mapped reads and convert to fastq
+
+  # Step03: extract mapped reads and convert to fastq
   mapped-fastq:
     run: view_awk_picard.cwl
     in:
