@@ -1,15 +1,16 @@
 #!/usr/bin/env cwl-runner
-
 cwlVersion: v1.0
 class: Workflow
 
 requirements:
   - class: ScatterFeatureRequirement
+  - class: MultipleInputFeatureRequirement
   - class: InlineJavascriptRequirement
   - class: StepInputExpressionRequirement
 
+
 inputs:
-  input_bam:
+  bam: 
     type: File
     label: Aligned sequences in BAM format
   ref_db_prefix:
@@ -22,9 +23,6 @@ inputs:
   keep_mates_together:
     type: boolean?
     default: True
-  num_bucket:
-    type: int?
-    default: 11
   validation_stringency:
     type: string?
     default: SILENT
@@ -34,9 +32,6 @@ inputs:
   output_extension:
     type: string?
     default: bam
-  sort_order:
-    type: string?
-    default: queryname
 
 outputs:
   output_bam:
@@ -55,38 +50,73 @@ outputs:
       type: array
       items: File
     outputSource: contamination/output_tie_bam
-    
 
 steps:
-  # Step01: split input bam for scattering
-  split:
-    run: split_sam.cwl
-    in:
-      input_sam_file: input_bam
-      keep_mates_together: keep_mates_together
-      num_bucket: num_bucket
-      validation_stringency: validation_stringency
-      output_prefix: output_prefix
-      output_extension: output_extension
-    out: [split_bams]
+  # Step01: extract chromosome information from input bam
+  get_chroms: 
+    in: 
+      bam: bam
+    out: [chroms]
+    run: get_chroms.cwl  
 
-  # Step02: sort reads by queryname and create flatstat if not exists
-  orig-sort:
-    run: sort_flagstat.cwl
+  # Step02a: extract reads with mates that map to different chromosomes
+  mismatch: 
     in:
-      input_bam: split/split_bams
-      sort_order:
-        default: queryname
-      output_bam:
-        valueFrom: $(inputs.input_bam.basename)   # here "inputs" refers to inputs in sort_flagstat.cwl 
-    scatter: [input_bam]
-    out: [sort_bam, flagstat]
+      bam: bam
+    out: [out_bam]
+    run: 
+      class: CommandLineTool
+      stdout: other.bam
+      inputs: 
+        bam: 
+          type: File
+          inputBinding: 
+            position: 0
+            prefix: -i 
+      arguments: ["-x", "-O", "queryname", "-o", "other.bam"]
+      outputs: 
+        out_bam: 
+          type: File
+          outputBinding: 
+            glob: "*.bam"
+      baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam] 
+
+  # Step02b: extract reads mapped to each chromosome
+  by_chrom:
+    in:
+      chroms:  
+        source: get_chroms/chroms
+      bam: bam
+    out: [out_bam]
+    scatter: chroms
+    run:
+      class: CommandLineTool
+      inputs:
+        chroms:
+          type: string
+          inputBinding:
+            position: 1
+            prefix: -c
+        bam:
+          type: File
+          inputBinding:
+            position: 0
+            prefix: -i
+      arguments: ["-X", "-O", "queryname", "-o", "$(inputs.chroms).bam"]
+      outputs: 
+        out_bam:
+         type: File
+         outputBinding: 
+           glob: "$(inputs.chroms).bam"
+      baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam]
 
   # Step03: extract mapped reads and convert to fastq
   mapped-fastq:
     run: view_awk_picard.cwl
     in:
-      input_bam: orig-sort/sort_bam
+      input_bam: 
+        source: [mismatch/out_bam, by_chrom/out_bam]
+        linkMerge: merge_flattened 
       output_fastq:
         valueFrom: $(inputs.input_bam.nameroot).fastq   # here "inputs" refers to inputs in view_awk_picard.cwl
     scatter: [input_bam]
@@ -107,7 +137,9 @@ steps:
   contamination:
     run: create_contam_lists.cwl
     in:
-      input_bam: orig-sort/sort_bam
+      input_bam:
+        source: [mismatch/out_bam, by_chrom/out_bam]
+        linkMerge: merge_flattened 
       output_contam_list: 
         valueFrom: $(inputs.input_bam.nameroot).contam.txt
       tie_bam:
@@ -121,7 +153,9 @@ steps:
   cleanse:
     run: tweak_sam.cwl
     in:
-      input_bam: orig-sort/sort_bam
+      input_bam: 
+        source: [mismatch/out_bam, by_chrom/out_bam]
+        linkMerge: merge_flattened
       output_bam:
         valueFrom: $(inputs.input_bam.nameroot).cleaned.bam
       unmap_reads: contamination/contam_list
@@ -135,7 +169,7 @@ steps:
     in:
       input_bams: cleanse/cleaned_bam
       output_bam:
-        source: input_bam
+        source: bam
         valueFrom: ${return self.nameroot + ".xenocp.bam"}
     out: [final_bam, flagstat]
   
@@ -146,7 +180,6 @@ steps:
       bam: finish/final_bam
       flagstat: finish/flagstat
     out: []
-
 
 s:author:
   class: s:Person
