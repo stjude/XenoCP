@@ -2,6 +2,13 @@
 cwlVersion: v1.0
 class: CommandLineTool
 
+hints:
+  SoftwareRequirement:
+    packages:
+      bam_to_chr:
+        specs: ["bam_to_chrs.sh"]
+
+
 baseCommand: bam_to_chrs.sh
 
 requirements: 
