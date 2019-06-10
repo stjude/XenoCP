@@ -144,11 +144,15 @@ ref_db_prefix: /references/ref.fa
 
 The following is an example `run` command where files are stored in `test/{data,references}`. Outputs are saved in `test/results`.
 
+This example assumes you are running against Mus Musculus (genome build MGSCv37). Set the path to the folder containing your reference data
+and run the following command to produce output from the included sample data. Test output for comparison is located at `sample_data/output_data`.
+
 ```
+$ mkdir `pwd`/results
 $ docker run \
-  --mount type=bind,source=\`pwd\`/test/data,target=/data,readonly \
-  --mount type=bind,source=\`pwd\`//test/references,target=/references,readonly \
-  --mount type=bind,source=\`pwd\`//test/results,target=/results \
+  --mount type=bind,source=`pwd`/sample_data/input_data,target=/data,readonly \
+  --mount type=bind,source=/path/to/references,target=/references,readonly \
+  --mount type=bind,source=`pwd`/results,target=/results \
   xenocp \
   /data/inputs.yml
 ```
