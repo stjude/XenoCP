@@ -34,6 +34,8 @@ disabled.
 [gawk]: https://www.gnu.org/software/gawk/
 [Java SE Development Kit]: https://www.oracle.com/technetwork/java/javase/overview/index.html
 [Gradle]: https://gradle.org/
+[htsjdk]: https://github.com/samtools/htsjdk
+[commons-cli]: https://commons.apache.org/proper/commons-cli/
 [Node.js]: https://nodejs.org/en/
 [Picard]: https://broadinstitute.github.io/picard/
 [Python]: https://www.python.org/
@@ -41,6 +43,16 @@ disabled.
 [html5lib]: https://github.com/html5lib/html5lib-python
 [samtools]: http://www.htslib.org/
 [zlib]: https://www.zlib.net/
+
+## Building
+
+Once the prerequisites are satisfied, build XenoCP using Gradle. 
+
+```
+$ gradle installDist
+```
+
+Add the artifacts under `xenocp/build/install` to your Java CLASSPATH.
 
 ## Usage
 
@@ -54,17 +66,21 @@ $ cwltool --outdir tmp/results cwl/xenocp.cwl tmp/inputs.yml
 
 ### Inputs
 
-XenoCP requires two inputs, defined in a YAML file as [CWL inputs]. E.g., `inputs.yml`:
+XenoCP requires three inputs, defined in a YAML file as [CWL inputs]. E.g., `inputs.yml`:
 
 ```
-input_bam:
+bam:
   class: File
   path: sample.bam
+bai:
+  class: File
+  path: sample.bai
 ref_db_prefix: /references/ref.fa
 ```
 
-`input_bam` is the input sample BAM; and `ref_db_prefix`, the basename of the
-input human reference assembly. For example, a prefix of `MGSCv37.fa` would assume
+`bam` is the input sample BAM, `bai` is the bam index for the input sample BAM 
+ and `ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
+For example, a prefix of `MGSCv37.fa` would assume
 the following files in the same directory exist: `MGSCv37.fa`,
 `MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, `MGSCv37.fa.dict`,
 `MGSCv37.fa.fai`, `MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
@@ -74,11 +90,9 @@ Several optional input paramters can be changed in the inputs file.
 ```
 suffix_length: 4
 keep_mates_together: true
-num_backet: 31
 validation_stringency: SILENT
 output_prefix: xenocp-
 output_extension: bam
-sort_order: queryname
 ```
 
 ### Create Reference Files
@@ -119,19 +133,22 @@ The paths given in the input parameters file must be from inside the
 container, not the host, e.g.,
 
 ```
-input_bam:
+bam:
   class: File
   path: /data/sample.bam
+bai: 
+  class: File
+  path: /data/sample.bai
 ref_db_prefix: /references/ref.fa
 ```
 
-The following is an example `run` command where files are stored in `tmp/test/{data,references}`. Outputs are saved in `tmp/test/results`.
+The following is an example `run` command where files are stored in `test/{data,references}`. Outputs are saved in `test/results`.
 
 ```
 $ docker run \
-  --mount type=bind,source=$(pwd)/tmp/test/data,target=/data,readonly \
-  --mount type=bind,source=$(pwd)/tmp/test/references,target=/references,readonly \
-  --mount type=bind,source=$(pwd)/tmp/test/results,target=/results \
+  --mount type=bind,source=\`pwd\`/test/data,target=/data,readonly \
+  --mount type=bind,source=\`pwd\`//test/references,target=/references,readonly \
+  --mount type=bind,source=\`pwd\`//test/results,target=/results \
   xenocp \
   /data/inputs.yml
 ```
