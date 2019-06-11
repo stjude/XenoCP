@@ -1,4 +1,16 @@
-# XenoCP
+## Getting started
+
+	git clone https://github.com/adamdingliang/XenoCP.git
+	cd XenoCP
+	gradle :xenocp:installDist
+
+Download contaminant genomic reference and update `sample_data/input_data/inputs-local.yml` with the path to the reference data.
+
+   
+	mkdir results
+	cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
+	
+## Introduction to XenoCP
 
 XenoCP is a cloud-based tool for cleansing mouse reads in xenograft BAMs. XenoCP can be easily incorporated into any workflow as it takes a BAM file
 as input and efficiently cleans up the mouse contamination and gives a clean human BAM output that could be used for downstream
@@ -34,8 +46,6 @@ disabled.
 [gawk]: https://www.gnu.org/software/gawk/
 [Java SE Development Kit]: https://www.oracle.com/technetwork/java/javase/overview/index.html
 [Gradle]: https://gradle.org/
-[htsjdk]: https://github.com/samtools/htsjdk
-[commons-cli]: https://commons.apache.org/proper/commons-cli/
 [Node.js]: https://nodejs.org/en/
 [Picard]: https://broadinstitute.github.io/picard/
 [Python]: https://www.python.org/
@@ -49,7 +59,7 @@ disabled.
 Once the prerequisites are satisfied, build XenoCP using Gradle. 
 
 ```
-$ gradle installDist
+$ gradle :xenocp:installDist
 ```
 
 Add the artifacts under `xenocp/build/install` to your Java CLASSPATH.
@@ -58,8 +68,12 @@ Add the artifacts under `xenocp/build/install` to your Java CLASSPATH.
 
 XenoCP uses [CWL] to describe its workflow.
 
+To run an example workflow, update `sample_data/input_data/inputs_local.yml` with the path to a reference genome.
+Then run the following.
+
 ```
-$ cwltool --outdir tmp/results cwl/xenocp.cwl tmp/inputs.yml
+$ mkdir results
+$ cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
 ```
 
 [CWL]: https://www.commonwl.org/
@@ -162,3 +176,15 @@ $ docker run \
 ## St. Jude Cloud
 
 To run XenoCP in St. Jude Cloud, please follow the directions at: https://stjude.github.io/sjcloud-docs/guides/tools/xenocp/
+
+## Availability
+
+[TODO] XenoCP is released under ...
+
+## Seeking help
+
+[TODO]
+
+## Citing XenoCP
+
+[TODO] Publication in prep
