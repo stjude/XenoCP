@@ -95,9 +95,9 @@ ref_db_prefix: /references/ref.fa
 `bam` is the input sample BAM, `bai` is the bam index for the input sample BAM 
  and `ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
 For example, a prefix of `MGSCv37.fa` would assume
-the following files in the same directory exist: `MGSCv37.fa`,
-`MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, `MGSCv37.fa.dict`,
-`MGSCv37.fa.fai`, `MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
+the following files in the same directory exist: 
+`MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, 
+`MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
 
 Several optional input paramters can be changed in the inputs file.
 
@@ -113,8 +113,6 @@ output_extension: bam
 
 Download the FASTA file for your genome assembly and run the following commands to create other files:
 ```
-$ samtools faidx $FASTA
-$ java picard.cmdline.PicardCommandLine CreateSequenceDictionary REFERENCE=$FASTA OUTPUT=$FASTA.dict
 $ bwa index -p $FASTA $FASTA
 ```
 
