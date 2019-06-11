@@ -158,3 +158,7 @@ $ docker run \
 ```
 
 [Dockerfile]: ./Dockerfile
+
+## St. Jude Cloud
+
+To run XenoCP in St. Jude Cloud, please follow the directions at: https://stjude.github.io/sjcloud-docs/guides/tools/xenocp/
