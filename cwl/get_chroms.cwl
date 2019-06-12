@@ -25,7 +25,6 @@ outputs:
   chroms: 
     outputBinding: 
       glob: "*.chrs"
-      #glob: $(stdout)
       loadContents: true
       outputEval: $(self[0].contents.split("\n").slice(0,-1))
     type: string[]

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Performs merge, mark duplicates, index of a set of sorted bam files using
 # Picard.  Also calculates flagstat and md5.
 #
@@ -51,8 +51,8 @@ fi
 # Do the merge
 INPUT_ARGS=
 for INPUT in $INPUTS; do INPUT_ARGS="$INPUT_ARGS INPUT=$INPUT"; done
-cmd="java.sh picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true USE_THREADING=true"
-date
+#cmd="java.sh picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true QUIET=true VERBOSITY=ERROR USE_THREADING=TRUE"
+cmd="sambamba merge -t 10 $L_MERGED $INPUTS"
 echo $cmd
 if ! $cmd
 then echo "Merge command failed" >&2; exit 1
@@ -63,29 +63,31 @@ if [ $NO_MARKDUP ]
 then
   echo "Skipping MarkDuplicates because $NO_MARKDUP was specified"
 else
-  cmd="java.sh  -Xmx8g picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
-  date
+  #cmd="java.sh -Xmx8g picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true QUIET=true VERBOSITY=ERROR"
+  cmd="sambamba markdup -t 10 $L_MERGED $L_OUTPUT"
   echo $cmd
   if ! $cmd
   then echo "Mark duplicates command failed" >&2; exit 1
   fi
 fi
 
+sambamba index -t 10 $L_OUTPUT ${bn}.bai
+sambamba flagstat -t 10 $L_OUTPUT  > $FLAGSTAT
+md5sum $L_OUTPUT > $L_OUTPUT.md5
+
 # Copy output
-cmd="cp $SCRATCH_DIR/$bn.bam $SCRATCH_DIR/$bn.bai $SCRATCH_DIR/$bn.bam.md5 $OUT_DIR/"
-date
+cmd="cp $SCRATCH_DIR/$bn.bam $SCRATCH_DIR/$bn.bam.bai $SCRATCH_DIR/$bn.bam.md5 $OUT_DIR/"
 echo $cmd
 if ! $cmd
 then echo "Copy to output failed" >&2; exit 1
 fi
 
 # Rename the index
-mv $OUT_DIR/$bn.bai $OUT_DIR/$bn.bam.bai
+#mv $OUT_DIR/$bn.bai $OUT_DIR/$bn.bam.bai
 
 # Do the flagstat
-cmd="samtools flagstat $L_OUTPUT"
-date
-echo $cmd \> $FLAGSTAT
-if ! $cmd > $FLAGSTAT
-then echo "Warning: flagstat command failed" >&2
-fi
+#cmd="samtools flagstat $L_OUTPUT"
+#echo $cmd \> $FLAGSTAT
+#if ! $cmd > $FLAGSTAT
+#then echo "Warning: flagstat command failed" >&2
+#fi
