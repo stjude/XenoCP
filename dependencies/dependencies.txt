@@ -1,0 +1,4 @@
+common-java-sam
+util-scripts
+picard
+commons-cli
