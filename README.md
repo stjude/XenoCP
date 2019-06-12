@@ -1,3 +1,5 @@
+# XenoCP
+
 ## Getting started
 
 	git clone https://github.com/adamdingliang/XenoCP.git
@@ -28,13 +30,12 @@ XenoCP workflow:
   * [Java SE Development Kit] ~1.8
     * [Gradle] ~5.3
   * [Node.js] ~10.15.3
-  * [Picard] =2.6.0
   * [Python] ~3.6.1
     * [cwltool] ~1.0
     * [html5lib] ~1.0.1
   * [samtools]† ~1.9
     * [zlib]
-  * [sambamba]
+  * [sambamba] ~0.7.0
 
 \* XenoCP requires the GNU inplementation of awk.
 
@@ -47,7 +48,6 @@ disabled.
 [Java SE Development Kit]: https://www.oracle.com/technetwork/java/javase/overview/index.html
 [Gradle]: https://gradle.org/
 [Node.js]: https://nodejs.org/en/
-[Picard]: https://broadinstitute.github.io/picard/
 [Python]: https://www.python.org/
 [cwltool]: https://github.com/common-workflow-language/cwltool
 [html5lib]: https://github.com/html5lib/html5lib-python
@@ -161,11 +161,11 @@ This example assumes you are running against Mus Musculus (genome build MGSCv37)
 and run the following command to produce output from the included sample data. Test output for comparison is located at `sample_data/output_data`.
 
 ```
-$ mkdir `pwd`/results
+$ mkdir $(pwd)/results
 $ docker run \
-  --mount type=bind,source=`pwd`/sample_data/input_data,target=/data,readonly \
+  --mount type=bind,source=$(pwd)/sample_data/input_data,target=/data,readonly \
   --mount type=bind,source=/path/to/references,target=/references,readonly \
-  --mount type=bind,source=`pwd`/results,target=/results \
+  --mount type=bind,source=$(pwd)/results,target=/results \
   xenocp \
   /data/inputs.yml
 ```
@@ -187,3 +187,7 @@ To run XenoCP in St. Jude Cloud, please follow the directions at https://www.stj
 ## Citing XenoCP
 
 [TODO] Publication in prep
+
+## Common Issues
+
+Sambamba uses a large number of temporary files while merging the final bam file. Depending on your system, the default open file limit may be too low. You can check the limit with `ulimit -n` and set the limit higher with `ulimit -Sn <value>`.

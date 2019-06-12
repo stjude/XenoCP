@@ -9,17 +9,44 @@
 # for output.
 #
 # $0 = (optional) --no-markdup to skip the mark dup step
-# $1 = output bam/sam
-# $2... = input bam/sam files
+# $1 = (optional) -t <threads> to execute steps multithreaded
+# $2 = output bam/sam
+# $3... = input bam/sam files
 
 # Show usage information if no parameters were sent
 if [ "$#" == 0 ]; then about.sh $0; exit 1; fi
 
+NUM_THREADS=1
+NO_MARKDUP=
+
 # Get parameters
-if [ "$1" == "--no-markdup" ]
-then NO_MARKDUP=$1; shift
-else NO_MARKDUP=
-fi
+while (( "$#" )); do
+  case "$1" in
+    --no-markdup)
+      NO_MARKDUP=$1
+      shift
+      ;;
+    -t|--threads)
+      NUM_THREADS=$2
+      shift 2
+      ;;
+    --) # end argument parsing
+      shift
+      break
+      ;;
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+# set positional arguments in their proper place
+eval set -- "$PARAMS"
+
 OUTPUT=$1
 shift
 INPUTS=$*
@@ -51,7 +78,7 @@ fi
 # Do the merge
 INPUT_ARGS=
 for INPUT in $INPUTS; do INPUT_ARGS="$INPUT_ARGS INPUT=$INPUT"; done
-cmd="sambamba merge -t 10 $L_MERGED $INPUTS"
+cmd="sambamba merge -t $NUM_THREADS $L_MERGED $INPUTS"
 echo $cmd
 if ! $cmd
 then echo "Merge command failed" >&2; exit 1
@@ -62,16 +89,24 @@ if [ $NO_MARKDUP ]
 then
   echo "Skipping MarkDuplicates because $NO_MARKDUP was specified"
 else
-  cmd="sambamba markdup -t 10 $L_MERGED $L_OUTPUT"
+  cmd="sambamba markdup -t $NUM_THREADS $L_MERGED $L_OUTPUT"
   echo $cmd
   if ! $cmd
   then echo "Mark duplicates command failed" >&2; exit 1
   fi
 fi
 
-sambamba index -t 10 $L_OUTPUT ${bn}.bai
-sambamba flagstat -t 10 $L_OUTPUT  > $FLAGSTAT
-md5sum $L_OUTPUT > $L_OUTPUT.md5
+sambamba index -t $NUM_THREADS $L_OUTPUT ${bn}.bai
+sambamba flagstat -t $NUM_THREADS $L_OUTPUT  > $FLAGSTAT
+if which md5sum > /dev/null
+then
+  md5sum $L_OUTPUT > $L_OUTPUT.md5
+elif which md5 > /dev/null
+then
+  md5 -q $L_OUTPUT > $L_OUTPUT.md5
+else
+  echo "No MD5 program found" >&2; exit 1
+fi
 
 # Copy output
 cmd="cp $SCRATCH_DIR/$bn.bam $SCRATCH_DIR/$bn.bam.bai $SCRATCH_DIR/$bn.bam.md5 $OUT_DIR/"
@@ -79,12 +114,3 @@ echo $cmd
 if ! $cmd
 then echo "Copy to output failed" >&2; exit 1
 fi
-
-# Rename the index
-
-# Do the flagstat
-#cmd="samtools flagstat $L_OUTPUT"
-#echo $cmd \> $FLAGSTAT
-#if ! $cmd > $FLAGSTAT
-#then echo "Warning: flagstat command failed" >&2
-#fi

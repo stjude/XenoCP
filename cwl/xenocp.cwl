@@ -7,7 +7,7 @@ requirements:
   - class: MultipleInputFeatureRequirement
   - class: InlineJavascriptRequirement
   - class: StepInputExpressionRequirement
-
+  - class: SubworkflowFeatureRequirement
 
 inputs:
   bam: 
@@ -32,6 +32,9 @@ inputs:
   output_extension:
     type: string?
     default: bam
+  n_threads: 
+    type: int?
+    default: 1
 
 outputs:
   output_bam:
@@ -53,69 +56,18 @@ outputs:
 
 steps:
   # Step01: extract chromosome information from input bam
-  get_chroms: 
+  split:
+    run: extract.cwl
     in: 
       bam: bam
-    out: [chroms]
-    run: get_chroms.cwl  
-
-  # Step02a: extract reads with mates that map to different chromosomes
-  mismatch: 
-    in:
-      bam: bam
-    out: [out_bam]
-    run: 
-      class: CommandLineTool
-      stdout: other.bam
-      inputs: 
-        bam: 
-          type: File
-          inputBinding: 
-            position: 0
-            prefix: -i 
-      arguments: ["-x", "-O", "queryname", "-o", "other.bam"]
-      outputs: 
-        out_bam: 
-          type: File
-          outputBinding: 
-            glob: "*.bam"
-      baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam] 
-
-  # Step02b: extract reads mapped to each chromosome
-  by_chrom:
-    in:
-      chroms:  
-        source: get_chroms/chroms
-      bam: bam
-    out: [out_bam]
-    scatter: chroms
-    run:
-      class: CommandLineTool
-      inputs:
-        chroms:
-          type: string
-          inputBinding:
-            position: 1
-            prefix: -c
-        bam:
-          type: File
-          inputBinding:
-            position: 0
-            prefix: -i
-      arguments: ["-X", "-O", "queryname", "-o", "$(inputs.chroms).bam"]
-      outputs: 
-        out_bam:
-         type: File
-         outputBinding: 
-           glob: "$(inputs.chroms).bam"
-      baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam]
-
+    out: [split_bams]
+  
   # Step03: extract mapped reads and convert to fastq
   mapped-fastq:
     run: view_awk_picard.cwl
     in:
       input_bam: 
-        source: [mismatch/out_bam, by_chrom/out_bam]
+        source: split/split_bams
         linkMerge: merge_flattened 
       output_fastq:
         valueFrom: $(inputs.input_bam.nameroot).fastq   # here "inputs" refers to inputs in view_awk_picard.cwl
@@ -132,14 +84,17 @@ steps:
         valueFrom: $(inputs.input_fastq.nameroot).contam.bam
     scatter: [input_fastq]
     out: [bam]
+    hints:
+      ResourceRequirement:
+        ramMin: 4800
+        coresMin: 1
 
   # Step05: find contamination reads
   contamination:
     run: create_contam_lists.cwl
     in:
       input_bam:
-        source: [mismatch/out_bam, by_chrom/out_bam]
-        linkMerge: merge_flattened 
+        source: split/split_bams 
       output_contam_list: 
         valueFrom: $(inputs.input_bam.nameroot).contam.txt
       tie_bam:
@@ -154,8 +109,7 @@ steps:
     run: tweak_sam.cwl
     in:
       input_bam: 
-        source: [mismatch/out_bam, by_chrom/out_bam]
-        linkMerge: merge_flattened
+        source: split/split_bams 
       output_bam:
         valueFrom: $(inputs.input_bam.nameroot).cleaned.bam
       unmap_reads: contamination/contam_list
@@ -171,6 +125,7 @@ steps:
       output_bam:
         source: bam
         valueFrom: ${return self.nameroot + ".xenocp.bam"}
+      n_threads: n_threads
     out: [final_bam, flagstat]
   
   # Step08: QC the merged bam
