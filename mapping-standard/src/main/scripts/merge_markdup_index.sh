@@ -51,7 +51,6 @@ fi
 # Do the merge
 INPUT_ARGS=
 for INPUT in $INPUTS; do INPUT_ARGS="$INPUT_ARGS INPUT=$INPUT"; done
-#cmd="java.sh picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true QUIET=true VERBOSITY=ERROR USE_THREADING=TRUE"
 cmd="sambamba merge -t 10 $L_MERGED $INPUTS"
 echo $cmd
 if ! $cmd
