@@ -54,17 +54,17 @@ outputs:
           return inputs.output_bam.replace(".bam", ".flagstat.txt");
         }
 
-  markdup:
-    type: File
-    outputBinding:
-      glob: |
-        ${
-          var i = inputs.output_bam.split('.').slice(0, -1).join('.');
-          if (inputs.skip_dup) {
-            return [];
-          } else {
-            return i + ".markdup.txt";
-          }
-        }
+#  markdup:
+#    type: File
+#    outputBinding:
+#      glob: |
+#        ${
+#          var i = inputs.output_bam.split('.').slice(0, -1).join('.');
+#          if (inputs.skip_dup) {
+#            return [];
+#          } else {
+#            return i + ".markdup.txt";
+#          }
+#        }
 
 

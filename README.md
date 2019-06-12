@@ -23,6 +23,7 @@ XenoCP workflow:
     * [html5lib] ~1.0.1
   * [samtools]† ~1.9
     * [zlib]
+  * [sambamba]
 
 \* XenoCP requires the GNU inplementation of awk.
 
@@ -41,6 +42,7 @@ disabled.
 [html5lib]: https://github.com/html5lib/html5lib-python
 [samtools]: http://www.htslib.org/
 [zlib]: https://www.zlib.net/
+[sambamba]: http://lomereiter.github.io/sambamba/
 
 ## Usage
 
