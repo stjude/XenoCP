@@ -63,7 +63,6 @@ if [ $NO_MARKDUP ]
 then
   echo "Skipping MarkDuplicates because $NO_MARKDUP was specified"
 else
-  #cmd="java.sh -Xmx8g picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true QUIET=true VERBOSITY=ERROR"
   cmd="sambamba markdup -t 10 $L_MERGED $L_OUTPUT"
   echo $cmd
   if ! $cmd
