@@ -7,7 +7,7 @@ baseCommand: view_awk_picard.sh
 hints:
   SoftwareRequirement:
     packages:
-      sort_flagstat: 
+      sort_flagstat:
         specs: ["sam_to_single.awk"]
       picard:
         specs: ["picard.cmdline.PicardCommandLine SamToFastq"]
