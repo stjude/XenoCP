@@ -83,7 +83,6 @@ then echo "Copy to output failed" >&2; exit 1
 fi
 
 # Rename the index
-#mv $OUT_DIR/$bn.bai $OUT_DIR/$bn.bam.bai
 
 # Do the flagstat
 #cmd="samtools flagstat $L_OUTPUT"
