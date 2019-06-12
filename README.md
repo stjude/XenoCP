@@ -6,7 +6,6 @@
 
 Download contaminant genomic reference and update `sample_data/input_data/inputs-local.yml` with the path to the reference data.
 
-   
 	mkdir results
 	cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
 	
