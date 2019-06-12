@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Performs merge, mark duplicates, index of a set of sorted bam files using
 # Picard.  Also calculates flagstat and md5.
 #
