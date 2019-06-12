@@ -175,7 +175,7 @@ $ docker run \
 
 ## St. Jude Cloud
 
-To run XenoCP in St. Jude Cloud, please follow the directions at: https://stjude.github.io/sjcloud-docs/guides/tools/xenocp/
+To run XenoCP in St. Jude Cloud, please follow the directions at https://www.stjude.cloud/docs/guides/tools/xenocp/
 
 ## Availability
 
