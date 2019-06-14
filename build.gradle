@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'distribution'
+}
+
+distributions {
+    main {
+        contents {
+            into('bin') {
+                // This ensures that files in earlier sources will take
+                // precedence over files of the same name from later sources
+                // /src/main/scripts contains code shared with the local
+                // infrastructure, and public-only overrides go in /bin
+                duplicatesStrategy = 'exclude'
+                from 'bin'
+                from 'src/main/scripts'
+                from 'dependencies/bin'
+            }
+            into('lib') {
+                // Puts the compiled xenocp jar into lib
+                from jar
+                // Puts all of the compile dependencies into lib
+                from configurations.compile
+            }
+        }
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.github.broadinstitute:picard:2.6.0'
+    compile 'commons-cli:commons-cli:1.2'
+    compile 'com.github.samtools:htsjdk:2.19.0'
+
+    compile files('dependencies/lib/java/xenocp-dependencies.jar')
+
+    testCompile 'junit:junit:4.10'
+}
+
+group = 'org.stjude.compbio.xenocp'
+version = '3.0.0'
+description = 'xenocp'
+sourceCompatibility = '1.8'

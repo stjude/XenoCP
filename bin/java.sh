@@ -2,11 +2,7 @@
 
 for arg in "$@"; do
     case $arg in
-    org.stjude.compbio.sam.*)
-        CLASSPATH=/opt/tools-sam/lib/*:$CLASSPATH
-        break
-        ;;
-    org.stjude.compbio.xenocp.*)
+    org.stjude.compbio.*)
         CLASSPATH=/opt/xenocp/lib/*:$CLASSPATH
         break
         ;;

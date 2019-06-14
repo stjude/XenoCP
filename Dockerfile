@@ -44,18 +44,15 @@ RUN mkdir -p /opt/picard/lib \
 
 ENV PATH /opt/gradle/bin:${PATH}
 
-COPY common-java-genome /tmp/xenocp/common-java-genome
-COPY common-java-sam /tmp/xenocp/common-java-sam
-COPY util-java /tmp/xenocp/util-java
-COPY tools-sam /tmp/xenocp/tools-sam
-COPY xenocp /tmp/xenocp/xenocp
+COPY bin /tmp/xenocp/bin
+COPY src /tmp/xenocp/src
+COPY dependencies /tmp/xenocp/dependencies
 COPY build.gradle /tmp/xenocp/build.gradle
 COPY settings.gradle /tmp/xenocp/settings.gradle
 
 RUN cd /tmp/xenocp \
     && gradle installDist \
-    && cp -r tools-sam/build/install/tools-sam /opt \
-    && cp -r xenocp/build/install/xenocp /opt
+    && cp -r build/install/xenocp /opt
 
 FROM ubuntu:18.04
 
@@ -75,22 +72,9 @@ RUN ln -s /usr/bin/gawk /bin/awk
 COPY --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
 COPY --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
 COPY --from=builder /opt/picard /opt/picard
-COPY --from=builder /opt/tools-sam /opt/tools-sam
 COPY --from=builder /opt/xenocp /opt/xenocp
-
-COPY bin/java-settmp.sh /usr/local/bin/java-settmp.sh
-COPY bin/java.sh /usr/local/bin/java.sh
-COPY bin/qclib.sh /usr/local/bin/qclib.sh
-COPY bin/view_awk_picard.sh /usr/local/bin/view_awk_picard.sh
+COPY --from=builder /opt/xenocp/bin/* /usr/local/bin/
 
 COPY cwl /opt/xenocp/cwl
-
-COPY mapping-standard/src/main/scripts/merge_markdup_index.sh /usr/local/bin/merge_markdup_index.sh
-COPY mapping-standard/src/main/scripts/qc_bam.sh /usr/local/bin/qc_bam.sh
-
-COPY tools-sam/src/main/scripts/sam_to_single.awk /usr/local/bin/sam_to_single.awk
-COPY tools-sam/src/main/scripts/sort_flagstat.sh /usr/local/bin/sort_flagstat.sh
-
-COPY xenocp/src/main/scripts/bwa_alignse_onlymapped.sh /usr/local/bin/bwa_alignse_onlymapped.sh
 
 ENTRYPOINT ["cwl-runner", "--outdir", "results", "/opt/xenocp/cwl/xenocp.cwl"]
