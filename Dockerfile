@@ -32,6 +32,13 @@ RUN cd /tmp \
     && make install
 
 RUN cd /tmp \
+    && wget https://github.com/biod/sambamba/releases/download/v0.7.0/sambamba-0.7.0-linux-static.gz \
+    && echo "5a739ea53ef296639825831e110e359eab6ff421e108c7e3f4df0d67859e3024 *sambamba-0.7.0-linux-static.gz" | sha256sum --check \
+    && gunzip sambamba-0.7.0-linux-static.gz \
+    && mv sambamba-0.7.0-linux-static /usr/local/bin/sambamba \
+    && chmod 0755 /usr/local/bin/sambamba
+
+RUN cd /tmp \
     && wget https://services.gradle.org/distributions/gradle-5.4-bin.zip \
     && echo "c8c17574245ecee9ed7fe4f6b593b696d1692d1adbfef425bef9b333e3a0e8de *gradle-5.4-bin.zip" | sha256sum --check \
     && unzip gradle-5.4-bin.zip \
@@ -71,6 +78,7 @@ RUN ln -s /usr/bin/gawk /bin/awk
 
 COPY --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
 COPY --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
+COPY --from=builder /usr/local/bin/sambamba /usr/local/bin/sambamba
 COPY --from=builder /opt/picard /opt/picard
 COPY --from=builder /opt/xenocp /opt/xenocp
 COPY --from=builder /opt/xenocp/bin/* /usr/local/bin/
