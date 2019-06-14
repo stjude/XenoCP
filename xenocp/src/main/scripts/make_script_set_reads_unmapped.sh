@@ -25,7 +25,7 @@ do
   out=$OUT_DIR/$bn.bam
   if [ -f "$namefile" ]
   then
-    echo java-settmp.sh - org.stjude.compbio.sam.TweakSam -i $bam -o $out -u $namefile -O coordinate -V SILENT
+    echo java.sh org.stjude.compbio.sam.TweakSam -i $bam -o $out -u $namefile -O coordinate -V SILENT
   else
     echo "No namefile for $bam.  Will write command to make symlink instead." >&2
     echo ln -s $bam $out

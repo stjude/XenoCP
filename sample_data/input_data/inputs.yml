@@ -1,0 +1,4 @@
+bam:
+  class: File
+  path: /data/SJRB001_X.subset.bam
+ref_db_prefix: /references/MGSCv37.fa

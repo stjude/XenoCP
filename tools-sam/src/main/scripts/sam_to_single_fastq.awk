@@ -1,4 +1,4 @@
-#!/bin/awk -f
+#!/usr/bin/env awk -f
 # Converts SAM input data to FASTQ output, interleaving paired records in the
 # same file.
 # Pass nosuffix=1 to NOT add the /1 or /2 for PE reads (will mean duplicate

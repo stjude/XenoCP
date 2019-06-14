@@ -21,11 +21,19 @@ inputs:
     doc: |
       Flag as true in order to skip
       the mark duplicates step.
+  n_threads:
+    type: int?
+    inputBinding: 
+      position: 2
+      prefix: -t
+    doc: |
+      Set number of threads for 
+      multithreaded steps.
 
   output_bam:
     type: string
     inputBinding:
-      position: 2
+      position: 3
     doc: |
       Name of final output bam file.
       Must have '.bam' extension. 
@@ -33,9 +41,10 @@ inputs:
   input_bams:
     type: File[]
     inputBinding:
-      position: 3
+      position: 4
     doc: |
       Array of bam files to merge. 
+
 
 outputs:
   final_bam:
@@ -53,18 +62,3 @@ outputs:
         ${ 
           return inputs.output_bam.replace(".bam", ".flagstat.txt");
         }
-
-  markdup:
-    type: File
-    outputBinding:
-      glob: |
-        ${
-          var i = inputs.output_bam.split('.').slice(0, -1).join('.');
-          if (inputs.skip_dup) {
-            return [];
-          } else {
-            return i + ".markdup.txt";
-          }
-        }
-
-

@@ -1,17 +1,20 @@
 #!/usr/bin/env cwl-runner
-
 cwlVersion: v1.0
 class: Workflow
 
 requirements:
   - class: ScatterFeatureRequirement
+  - class: MultipleInputFeatureRequirement
   - class: InlineJavascriptRequirement
   - class: StepInputExpressionRequirement
+  - class: SubworkflowFeatureRequirement
 
 inputs:
-  input_bam:
+  bam: 
     type: File
     label: Aligned sequences in BAM format
+    secondaryFiles:
+     - .bai
   ref_db_prefix:
     type: string
     label: contamination genome reference db prefix
@@ -22,9 +25,6 @@ inputs:
   keep_mates_together:
     type: boolean?
     default: True
-  num_backet:
-    type: int?
-    default: 11
   validation_stringency:
     type: string?
     default: SILENT
@@ -34,9 +34,9 @@ inputs:
   output_extension:
     type: string?
     default: bam
-  sort_order:
-    type: string?
-    default: queryname
+  n_threads: 
+    type: int?
+    default: 1
 
 outputs:
   output_bam:
@@ -55,44 +55,28 @@ outputs:
       type: array
       items: File
     outputSource: contamination/output_tie_bam
-    
 
 steps:
-  # Step01: split input bam for scattering
+  # Step01: extract chromosome information from input bam
   split:
-    run: split_sam.cwl
-    in:
-      input_sam_file: input_bam
-      keep_mates_together: keep_mates_together
-      num_backet: num_backet
-      validation_stringency: validation_stringency
-      output_prefix: output_prefix
-      output_extension: output_extension
+    run: extract.cwl
+    in: 
+      bam: bam
     out: [split_bams]
-
-  # Step02: sort reads by queryname and create flatstat if not exists
-  orig-sort:
-    run: sort_flagstat.cwl
-    in:
-      input_bam: split/split_bams
-      sort_order:
-        default: queryname
-      output_bam:
-        valueFrom: $(inputs.input_bam.basename)   # here "inputs" refers to inputs in sort_flagstat.cwl 
-    scatter: [input_bam]
-    out: [sort_bam, flagstat]
-
-  # Step03: extract mapped reads and convert to fastq
+  
+  # Step02: extract mapped reads and convert to fastq
   mapped-fastq:
     run: view_awk_picard.cwl
     in:
-      input_bam: orig-sort/sort_bam
+      input_bam: 
+        source: split/split_bams
+        linkMerge: merge_flattened 
       output_fastq:
         valueFrom: $(inputs.input_bam.nameroot).fastq   # here "inputs" refers to inputs in view_awk_picard.cwl
     scatter: [input_bam]
     out: [fastq]
 
-  # Step04: mapped extacted reads to the contamination genome
+  # Step03: mapped extacted reads to the contamination genome
   mapping:
     run: bwa_alignse_onlymapped.cwl
     in:
@@ -102,12 +86,17 @@ steps:
         valueFrom: $(inputs.input_fastq.nameroot).contam.bam
     scatter: [input_fastq]
     out: [bam]
+    hints:
+      ResourceRequirement:
+        ramMin: 4800
+        coresMin: 1
 
-  # Step05: find contamination reads
+  # Step04: find contamination reads
   contamination:
     run: create_contam_lists.cwl
     in:
-      input_bam: orig-sort/sort_bam
+      input_bam:
+        source: split/split_bams 
       output_contam_list: 
         valueFrom: $(inputs.input_bam.nameroot).contam.txt
       tie_bam:
@@ -117,11 +106,12 @@ steps:
     scatterMethod: dotproduct
     out: [contam_list, output_tie_bam]
   
-  # Step06: clean the original bam by setting the contamination reads to be unmapped
+  # Step05: clean the original bam by setting the contamination reads to be unmapped
   cleanse:
     run: tweak_sam.cwl
     in:
-      input_bam: orig-sort/sort_bam
+      input_bam: 
+        source: split/split_bams 
       output_bam:
         valueFrom: $(inputs.input_bam.nameroot).cleaned.bam
       unmap_reads: contamination/contam_list
@@ -129,24 +119,24 @@ steps:
     scatterMethod: dotproduct
     out: [cleaned_bam]
 
-  # Step07: merge split bams, index and mark duplicates
+  # Step06: merge split bams, index and mark duplicates
   finish:
     run: merge_markdup_index.cwl
     in:
       input_bams: cleanse/cleaned_bam
       output_bam:
-        source: input_bam
+        source: bam
         valueFrom: ${return self.nameroot + ".xenocp.bam"}
+      n_threads: n_threads
     out: [final_bam, flagstat]
   
-  # Step08: QC the merged bam
+  # Step07: QC the merged bam
   finalqc:
     run: qc_bam.cwl
     in:
       bam: finish/final_bam
       flagstat: finish/flagstat
     out: []
-
 
 s:author:
   class: s:Person
