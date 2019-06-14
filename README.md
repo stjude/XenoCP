@@ -81,19 +81,16 @@ $ cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.ym
 
 ### Inputs
 
-XenoCP requires three inputs, defined in a YAML file as [CWL inputs]. E.g., `inputs.yml`:
+XenoCP requires two inputs, defined in a YAML file as [CWL inputs]. E.g., `inputs.yml`:
 
 ```
 bam:
   class: File
   path: sample.bam
-bai:
-  class: File
-  path: sample.bai
 ref_db_prefix: /references/ref.fa
 ```
 
-`bam` is the input sample BAM, `bai` is the bam index for the input sample BAM 
+`bam` is the input sample BAM 
  and `ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
 For example, a prefix of `MGSCv37.fa` would assume
 the following files in the same directory exist: 
@@ -149,9 +146,6 @@ container, not the host, e.g.,
 bam:
   class: File
   path: /data/sample.bam
-bai: 
-  class: File
-  path: /data/sample.bai
 ref_db_prefix: /references/ref.fa
 ```
 

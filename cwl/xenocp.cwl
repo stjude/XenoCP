@@ -13,6 +13,8 @@ inputs:
   bam: 
     type: File
     label: Aligned sequences in BAM format
+    secondaryFiles:
+     - .bai
   ref_db_prefix:
     type: string
     label: contamination genome reference db prefix
@@ -62,7 +64,7 @@ steps:
       bam: bam
     out: [split_bams]
   
-  # Step03: extract mapped reads and convert to fastq
+  # Step02: extract mapped reads and convert to fastq
   mapped-fastq:
     run: view_awk_picard.cwl
     in:
@@ -74,7 +76,7 @@ steps:
     scatter: [input_bam]
     out: [fastq]
 
-  # Step04: mapped extacted reads to the contamination genome
+  # Step03: mapped extacted reads to the contamination genome
   mapping:
     run: bwa_alignse_onlymapped.cwl
     in:
@@ -89,7 +91,7 @@ steps:
         ramMin: 4800
         coresMin: 1
 
-  # Step05: find contamination reads
+  # Step04: find contamination reads
   contamination:
     run: create_contam_lists.cwl
     in:
@@ -104,7 +106,7 @@ steps:
     scatterMethod: dotproduct
     out: [contam_list, output_tie_bam]
   
-  # Step06: clean the original bam by setting the contamination reads to be unmapped
+  # Step05: clean the original bam by setting the contamination reads to be unmapped
   cleanse:
     run: tweak_sam.cwl
     in:
@@ -117,7 +119,7 @@ steps:
     scatterMethod: dotproduct
     out: [cleaned_bam]
 
-  # Step07: merge split bams, index and mark duplicates
+  # Step06: merge split bams, index and mark duplicates
   finish:
     run: merge_markdup_index.cwl
     in:
@@ -128,7 +130,7 @@ steps:
       n_threads: n_threads
     out: [final_bam, flagstat]
   
-  # Step08: QC the merged bam
+  # Step07: QC the merged bam
   finalqc:
     run: qc_bam.cwl
     in:
