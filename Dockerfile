@@ -32,6 +32,13 @@ RUN cd /tmp \
     && make install
 
 RUN cd /tmp \
+    && wget https://github.com/biod/sambamba/releases/download/v0.7.0/sambamba-0.7.0-linux-static.gz \
+    && echo "5a739ea53ef296639825831e110e359eab6ff421e108c7e3f4df0d67859e3024 *sambamba-0.7.0-linux-static.gz" | sha256sum --check \
+    && gunzip sambamba-0.7.0-linux-static.gz \
+    && mv sambamba-0.7.0-linux-static /usr/local/bin/sambamba \
+    && chmod 0755 /usr/local/bin/sambamba
+
+RUN cd /tmp \
     && wget https://services.gradle.org/distributions/gradle-5.4-bin.zip \
     && echo "c8c17574245ecee9ed7fe4f6b593b696d1692d1adbfef425bef9b333e3a0e8de *gradle-5.4-bin.zip" | sha256sum --check \
     && unzip gradle-5.4-bin.zip \
@@ -44,18 +51,15 @@ RUN mkdir -p /opt/picard/lib \
 
 ENV PATH /opt/gradle/bin:${PATH}
 
-COPY common-java-genome /tmp/xenocp/common-java-genome
-COPY common-java-sam /tmp/xenocp/common-java-sam
-COPY util-java /tmp/xenocp/util-java
-COPY tools-sam /tmp/xenocp/tools-sam
-COPY xenocp /tmp/xenocp/xenocp
+COPY bin /tmp/xenocp/bin
+COPY src /tmp/xenocp/src
+COPY dependencies /tmp/xenocp/dependencies
 COPY build.gradle /tmp/xenocp/build.gradle
 COPY settings.gradle /tmp/xenocp/settings.gradle
 
 RUN cd /tmp/xenocp \
     && gradle installDist \
-    && cp -r tools-sam/build/install/tools-sam /opt \
-    && cp -r xenocp/build/install/xenocp /opt
+    && cp -r build/install/xenocp /opt
 
 FROM ubuntu:18.04
 
@@ -74,23 +78,11 @@ RUN ln -s /usr/bin/gawk /bin/awk
 
 COPY --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
 COPY --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
+COPY --from=builder /usr/local/bin/sambamba /usr/local/bin/sambamba
 COPY --from=builder /opt/picard /opt/picard
-COPY --from=builder /opt/tools-sam /opt/tools-sam
 COPY --from=builder /opt/xenocp /opt/xenocp
-
-COPY bin/java-settmp.sh /usr/local/bin/java-settmp.sh
-COPY bin/java.sh /usr/local/bin/java.sh
-COPY bin/qclib.sh /usr/local/bin/qclib.sh
-COPY bin/view_awk_picard.sh /usr/local/bin/view_awk_picard.sh
+COPY --from=builder /opt/xenocp/bin/* /usr/local/bin/
 
 COPY cwl /opt/xenocp/cwl
-
-COPY mapping-standard/src/main/scripts/merge_markdup_index.sh /usr/local/bin/merge_markdup_index.sh
-COPY mapping-standard/src/main/scripts/qc_bam.sh /usr/local/bin/qc_bam.sh
-
-COPY tools-sam/src/main/scripts/sam_to_single.awk /usr/local/bin/sam_to_single.awk
-COPY tools-sam/src/main/scripts/sort_flagstat.sh /usr/local/bin/sort_flagstat.sh
-
-COPY xenocp/src/main/scripts/bwa_alignse_onlymapped.sh /usr/local/bin/bwa_alignse_onlymapped.sh
 
 ENTRYPOINT ["cwl-runner", "--outdir", "results", "/opt/xenocp/cwl/xenocp.cwl"]
