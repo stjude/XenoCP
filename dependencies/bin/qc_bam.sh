@@ -88,7 +88,7 @@ then
   paired=`grep 'paired in sequencing' $FLAGSTAT | cut -d ' ' -f 1`
   if [ "$paired" -eq 0 -o "$paired" -eq "$readtot" ]
   then passtest
-  else failtest total=$readtot paired=$paired
+  else warntest total=$readtot paired=$paired
   fi
   
   starttest Read1And2Counts
@@ -96,7 +96,7 @@ then
   read2=`grep -m 1 read2 $FLAGSTAT | cut -d ' ' -f 1`
   if [ "$read1" -eq "$read2" ]
   then passtest
-  else failtest read1=$read1 read2=$read2
+  else warntest read1=$read1 read2=$read2
   fi
   
   starttest Read1Plus2EqualsPaired
