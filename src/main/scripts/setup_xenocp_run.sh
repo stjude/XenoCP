@@ -273,7 +273,7 @@ do
 	else dir=$OUT_DIR/\$sample.\$qualifier/\$target
 	fi
 	if [ "\$qualifier" == "" ]; then dotq= ; else dotq=".\$qualifier"; fi
-	if ! qcquiet.sh `get_step_failed_qc_dir`/\$sample qc_bam.sh \$dir/\$sample\$dotq.bam indexed \$dir/\$sample\$dotq.flagstat.txt
+	if ! qcquiet.sh --exit-on-warn 0 `get_step_failed_qc_dir`/\$sample qc_bam.sh \$dir/\$sample\$dotq.bam indexed \$dir/\$sample\$dotq.flagstat.txt
 	then anyfail=yes
 	fi
 done < $RUN_CONFIG
