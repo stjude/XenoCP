@@ -1,0 +1,134 @@
+{
+  "name": "stjude_xenocp",
+  "title": "XenoCP (St. Jude)",
+  "summary": "Xenograft sample cleaning pipeline",
+  "dxapi": "1.0.1",
+  "version": "3.0.0",
+  "openSource": false,
+  "developers": [ "user-lding", "user-mrusch", "user-athrasher" ],
+  "authorizedUsers": [
+      "user-lding",
+      "user-appdpdnanexus_stjude.org",
+      "user-appdddnanexus_stjude.org",
+      "org-stjude_cloud_app_runners",
+      "org-stjude_cloud"
+  ], 
+  "inputSpec": [
+    {
+      "name": "input_bam",
+      "label": "Input BAM",
+      "class": "file",
+      "optional": false,
+      "patterns": [
+        "*.bam"
+      ],
+      "help": ""
+    },
+    {
+      "name": "input_bai",
+      "label": "Input BAM Index",
+      "class": "file",
+      "optional": false,
+      "patterns": [
+        "*.bai"
+      ],
+      "help": ""
+    },
+    {
+      "name": "ref_bwa_index_tgz",
+      "label": "Custom Host Genome",
+      "class": "file",
+      "optional": true,
+      "patterns": ["*.tgz", "*.tar.gz"],
+      "help": "Support for cleansing reads from a mouse host using genomes GRCm38 or MGSCv37 is built-in.  See the Host Genome parameter.  If you need to clean reads using a different host genome, then set Host Genome to Custom and specify the custom host genome here, as a gzipped tar archive of the bwa index."
+    },
+    {
+      "name": "ref_name",
+      "label": "Host Genome",
+      "class": "string",
+      "choices": ["GRCm38", "MGSCv37", "Custom, specified as input"],
+      "optional": false,
+      "default": "GRCm38",
+      "help": ""
+    },
+    {
+      "name": "output_prefix",
+      "label": "Output Filename Prefix",
+      "class": "string",
+      "optional": true,
+      "default": "xenocp-",
+      "help": ""
+    },
+    {
+      "name": "output_extension",
+      "label": "Output File Extension",
+      "class": "string",
+      "choices": ["bam", "sam"],
+      "optional": true,
+      "default": "bam",
+      "help": ""
+    }
+  ],
+  "outputSpec": [
+    {
+      "name": "output_bam",
+      "label": "Cleaned bam with index and md5 files",
+      "class": "array:file",
+      "patterns": [
+        "*.bam*"
+      ],
+      "help": ""
+    },
+    {
+      "name": "flagstat",
+      "label": "bam flagstat file",
+      "class": "file",
+      "patterns": [
+        "*.flagstat.txt"
+      ],
+      "help": ""
+    },
+    {
+      "name": "contam_list",
+      "label": "a list of files with contamination reads",
+      "class": "array:file",
+      "patterns": [
+        "*.contam.txt"
+      ],
+      "help": ""
+    },
+    {
+      "name": "output_tie_bam",
+      "label": "a list of bam files containing tie reads",
+      "class": "array:file",
+      "patterns": [
+        "*.tie.bam"
+      ],
+      "help": ""
+    }
+  ],
+  "billTo": "org-stjude_cloud",
+  "access": {
+    "allProjects": "VIEW"
+  },
+  "runSpec": {
+    "timeoutPolicy": {
+      "*": {
+        "hours": 48
+      }
+    },
+    "interpreter": "bash",
+    "release": "16.04",
+    "distribution": "Ubuntu",
+    "file": "src/stjude_xenocp.sh"
+  },
+  "regionalOptions": {
+    "azure:westus": {
+      "systemRequirements": {
+        "*": {
+          "instanceType": "azure:mem2_ssd1_x16"
+        }
+      }
+    }
+  }
+}
