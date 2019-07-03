@@ -2,7 +2,7 @@
 
 ## Getting started
 
-	git clone https://github.com/adamdingliang/XenoCP.git
+	git clone https://github.com/stjude/XenoCP.git
 	cd XenoCP
 	gradle :xenocp:installDist
 
@@ -17,7 +17,7 @@ XenoCP is a cloud-based tool for cleansing mouse reads in xenograft BAMs. XenoCP
 as input and efficiently cleans up the mouse contamination and gives a clean human BAM output that could be used for downstream
 genomic analysis. 
 
-St. Jude cloud version
+St. Jude cloud version: ?
 
 XenoCP workflow:
 <!--![Alt text](images/xenocp_workflow2.png) -->
