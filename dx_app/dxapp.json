@@ -2,10 +2,10 @@
   "name": "stjude_xenocp",
   "title": "XenoCP (St. Jude)",
   "summary": "Xenograft sample cleaning pipeline",
-  "dxapi": "1.0.1",
+  "dxapi": "1.0.0",
   "version": "3.0.0",
-  "openSource": false,
-  "developers": [ "user-lding", "user-mrusch", "user-athrasher" ],
+  "openSource": true,
+  "developers": ["user-lding", "user-mrusch", "user-athrasher"],
   "authorizedUsers": [
       "user-lding",
       "user-appdpdnanexus_stjude.org",
