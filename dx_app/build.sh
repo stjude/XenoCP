@@ -25,7 +25,7 @@ then no_docker_build=1; shift
 fi
 VERS=$1
 shift
-DX_BUILD_ARGS="$@"
+# Remaining arguments are passed to dx build
 
 # Validate version
 dxapp_version=`cat dxapp.json | tr -d '\t "' | sed 's/,$//' | awk -F : '$1 == "version" { print $2; exit }'`
@@ -38,14 +38,10 @@ fi
 set -ex
 
 if [ "$no_docker_build" == "" ]
-then
-  (
-    cd ..
-    docker build -t xenocp:$VERS .
-  )
+then docker build -t xenocp:$VERS ..
 fi
 
 mkdir -p resources/stjude
 docker save xenocp:$VERS | gzip -c > resources/stjude/xenocp-docker.tar.gz
 
-dx build $DX_BUILD_ARGS
+dx build "$@"
