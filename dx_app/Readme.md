@@ -1,5 +1,6 @@
 <!-- dx-header -->
 # XenoCP: Xenograft sample cleaning pipeline
+<!-- /dx-header -->
 
 Analysis of next-generation sequencing (NGS) data from patient-derived
 xenograft (PDX) samples is complicated by the presence of reads from
@@ -15,6 +16,6 @@ be changed in the additional input parameters.
 
 To use another reference genome for host:
 1. Prepare a BWA index
-2. Tar and gzip the index files into a .tar.gz or .tgz file.
-3. Provide it as the input file Custom Host Genome
-4. In the additional input parameters, change the Host Genome to Custom.
+2. Tar and gzip the index files into a `.tar.gz` or `.tgz` file.
+3. Provide it as the input file _Custom Host Genome_.
+4. In the additional input parameters, change the _Host Genome_ to Custom.
