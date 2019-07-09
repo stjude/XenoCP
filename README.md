@@ -1,23 +1,35 @@
 # XenoCP
 
+XenoCP is a tool for cleansing mouse reads in xenograft BAMs.
+XenoCP can be easily incorporated into any workflow as it takes a BAM file
+as input and efficiently cleans up the mouse contamination and gives a clean
+human BAM output that could be used for downstream genomic analysis. 
+
 ## Getting started
+
+XenoCP can be run in the cloud on DNAnexus at
+https://platform.dnanexus.com/app/stjude_xenocp
+
+The easiest way to get XenoCP running locally is using Docker, as `docker build`
+will install all of the dependencies into the container:
 
 	git clone https://github.com/stjude/XenoCP.git
 	cd XenoCP
-	gradle :xenocp:installDist
-
-Download contaminant genomic reference and update `sample_data/input_data/inputs-local.yml` with the path to the reference data.
-
+	docker build -t xenocp
+	
+	wget -r http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37
+	
+	# Test run on small dataset
 	mkdir results
-	cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
+	docker run -t xenocp 
+	cwltool --outdir sample_data_results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
 	
 ## Introduction to XenoCP
 
-XenoCP is a cloud-based tool for cleansing mouse reads in xenograft BAMs. XenoCP can be easily incorporated into any workflow as it takes a BAM file
-as input and efficiently cleans up the mouse contamination and gives a clean human BAM output that could be used for downstream
-genomic analysis. 
-
-St. Jude cloud version: ?
+XenoCP takes a BAM with xenograft reads mapped to the graft genome (e.g. human).
+It extracts aligned reads and remaps to the host genome (e.g. mouse) to
+determine whether the reads are from host or graft.  Output is a copy of the
+original BAM with host reads marked as unmapped.
 
 XenoCP workflow:
 <!--![Alt text](images/xenocp_workflow2.png) -->
