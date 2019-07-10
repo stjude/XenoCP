@@ -133,7 +133,7 @@ $ bwa index -p $FASTA $FASTA
 
 ### Download MGSCv37 reference files
 
-Reference files are provided for version MGSCv37 of mouse and are available from: http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37 
+Reference files are provided for version MGSCv37 of mouse and are available from http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37
 
 ### Run
 
