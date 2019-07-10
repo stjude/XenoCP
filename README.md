@@ -73,7 +73,7 @@ disabled.
 
 
 
-## Local Usage
+## Local usage
 
 
 ### Obtain XenoCP 
