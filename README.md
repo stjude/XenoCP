@@ -201,7 +201,8 @@ $ docker run \
 
 ## Evaluate test data results
 
-If you have [bcftools] and a [GRCh37-lite] reference file, the following will show two variants in the input file. The variant on chromosome 1 is a variant in the host genome. The variant on chromosome 9 is a variant in the graft genome. 
+If you have [bcftools] and a [GRCh37-lite] reference file, the following will show two variants in the input file. 
+The variant on chromosome 1 is an artifact of mouse reads. The variant on chromosome 9 is a variant in the graft genome. 
 
 ```
 $ bcftools mpileup -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/input_data/SJRB001_X.subset.bam | bcftools call -m - | tail -n 3
