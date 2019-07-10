@@ -63,7 +63,8 @@ Once the prerequisites are satisfied, build XenoCP using Gradle.
 $ gradle :xenocp:installDist
 ```
 
-Add the artifacts under `xenocp/build/install` to your Java CLASSPATH.
+Add the artifacts under `build/install/xenocp/lib/` to your Java CLASSPATH.
+Add the artifacts under `build/install/xenocp/bin` to your PATH.
 
 ## Usage
 
