@@ -215,7 +215,7 @@ Output:
 9	19451994	.	G	A	182	.	DP=26;VDB=0.130558;SGB=-0.680642;RPB=0.887078;MQB=0.948139;MQSB=0.955682;BQB=0.053431;MQ0F=0;ICB=1;HOB=0.5;AC=1;AN=2;DP4=5,8,6,6;MQ=58	GT:PL	0/1:215,0,255
 ```
 
-After running XenoCP, the host genome variant should be removed as the supporting reads will be unmapped. The following command demonstrates the removal of the variant on chromosome 1 in the output of the sample data.
+After running XenoCP, the host genome variant is removed, as the supporting reads will be unmapped. The following command demonstrates the removal of the variant on chromosome 1 in the output of the sample data.
 
 
 ```
