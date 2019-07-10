@@ -11,7 +11,7 @@ XenoCP can be run in the cloud on DNAnexus at
 https://platform.dnanexus.com/app/stjude_xenocp
 
 The easiest way to get XenoCP running locally is using Docker, as `docker build`
-will install all of the dependencies into the container:
+creates an image with all of the dependencies:
 
 	git clone https://github.com/stjude/XenoCP.git
 	cd XenoCP
