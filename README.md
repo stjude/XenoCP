@@ -30,7 +30,7 @@ creates an image with all of the dependencies:
 	
 ## Introduction to XenoCP
 
-XenoCP takes a BAM with xenograft reads mapped to the graft genome (e.g. human).
+XenoCP takes a BAM with xenograft reads mapped to the graft genome (e.g., human).
 It extracts aligned reads and remaps to the host genome (e.g. mouse) to
 determine whether the reads are from host or graft.  Output is a copy of the
 original BAM with host reads marked as unmapped.
