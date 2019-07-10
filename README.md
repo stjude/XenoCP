@@ -2,7 +2,7 @@
 
 XenoCP is a tool for cleansing mouse reads in xenograft BAMs.
 XenoCP can be easily incorporated into any workflow, as it takes a BAM file
-as input and efficiently cleans up the mouse contamination and gives a clean
+as input and efficiently cleans up the mouse contamination. The output is a clean
 human BAM file that could be used for downstream genomic analysis. 
 
 ## Getting started
@@ -204,7 +204,7 @@ $ docker run \
 If you have [bcftools] and a [GRCh37-lite] reference file, the following will show two variants in the input file. The variant on chromosome 1 is a variant in the host genome. The variant on chromosome 9 is a variant in the graft genome. 
 
 ```
-$ bcftools mpileup  -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/input_data/SJRB001_X.subset.bam | bcftools call -m - | tail -n 3
+$ bcftools mpileup -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/input_data/SJRB001_X.subset.bam | bcftools call -m - | tail -n 3
 ```
 
 Output: 
@@ -219,7 +219,7 @@ After running XenoCP, the host genome variant is removed, as the supporting read
 
 
 ```
-$ bcftools mpileup  -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/output_data/SJRB001_X.subset.xenocp.bam | bcftools call -m - | tail -n 3
+$ bcftools mpileup -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/output_data/SJRB001_X.subset.xenocp.bam | bcftools call -m - | tail -n 3
 ```
 
 Output: 
@@ -257,7 +257,7 @@ limitations under the License.
 
 ## Seeking help
 
-For questions and bug reports, please open an issue on the GitHub project page.
+For questions and bug reports, please open an issue on the [GitHub] project page.
 
 [GitHub]: https://github.com/stjude/XenoCP/issues
 
