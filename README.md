@@ -92,7 +92,7 @@ $ gradle installDist
 ```
 
 Add the artifacts under `build/install/xenocp/lib` to your Java `CLASSPATH`.
-Add the artifacts under `build/install/xenocp/bin` to your PATH.
+Add the artifacts under `build/install/xenocp/bin` to your `PATH`.
 
 ### Inputs
 
