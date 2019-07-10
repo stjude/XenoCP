@@ -1,4 +1,4 @@
-#!/bin/awk -f
+#!/usr/bin/env awk -f
 # Removes pairing information from SAM data.
 #
 # Read 1/2 information is added as a suffix on the read name.
