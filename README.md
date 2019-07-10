@@ -87,7 +87,7 @@ git clone https://github.com/stjude/XenoCP.git
 Once the prerequisites are satisfied, build XenoCP using Gradle. 
 
 ```
-$ gradle :xenocp:installDist
+$ gradle installDist
 ```
 
 Add the artifacts under `build/install/xenocp/lib` to your Java CLASSPATH.
