@@ -71,7 +71,18 @@ disabled.
 [zlib]: https://www.zlib.net/
 [sambamba]: http://lomereiter.github.io/sambamba/
 
-## Building
+
+
+## Local Usage
+
+### Obtain XenoCP 
+
+Clone XenoCP from GitHub: 
+```
+git clone https://github.com/stjude/XenoCP.git
+```
+
+### Build XenoCP
 
 Once the prerequisites are satisfied, build XenoCP using Gradle. 
 
@@ -80,20 +91,6 @@ $ gradle :xenocp:installDist
 ```
 
 Add the artifacts under `xenocp/build/install` to your Java CLASSPATH.
-
-## Usage
-
-XenoCP uses [CWL] to describe its workflow.
-
-To run an example workflow, update `sample_data/input_data/inputs_local.yml` with the path to a reference genome.
-Then run the following.
-
-```
-$ mkdir results
-$ cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
-```
-
-[CWL]: https://www.commonwl.org/
 
 ### Inputs
 
@@ -132,6 +129,24 @@ $ bwa index -p $FASTA $FASTA
 
 [CWL inputs]: https://www.commonwl.org/user_guide/02-1st-example/index.html
 
+### Download MGSCv37 reference files
+
+Reference files are provided for version MGSCv37 of mouse and are available from: http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37 
+
+### Run
+
+XenoCP uses [CWL] to describe its workflow.
+
+To run an example workflow, update `sample_data/input_data/inputs_local.yml` with the path to a reference genome.
+Then run the following.
+
+```
+$ mkdir results
+$ cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
+```
+
+[CWL]: https://www.commonwl.org/
+
 ## Docker
 
 XenoCP provides a [Dockerfile] that builds an image with all the included
@@ -139,7 +154,7 @@ dependencies. To use this image, install [Docker] for your platform.
 
 [Docker]: https://www.docker.com/
 
-### Build
+### Build Docker image
 
 In the XenoCP project directory, build the Docker image.
 
@@ -165,7 +180,7 @@ bam:
 ref_db_prefix: /reference/ref.fa
 ```
 
-The following is an example `run` command where files are stored in `test/{data,references}`. Outputs are saved in `test/results`.
+The following is an example `run` command where files are stored in `test/{data,reference}`. Outputs are saved in `test/results`.
 
 This example assumes you are running against Mus Musculus (genome build MGSCv37). Set the path to the folder containing your reference data
 and run the following command to produce output from the included sample data. Test output for comparison is located at `sample_data/output_data`.
@@ -181,6 +196,42 @@ $ docker run \
 ```
 
 [Dockerfile]: ./Dockerfile
+
+## Evaluate test data results
+
+If you have [bcftools] and a [GRCh37-lite] reference file, the following will show two variants in the input file. The variant on chromosome 1 is a variant in the host genome. The variant on chromosome 9 is a variant in the graft genome. 
+
+```
+$ bcftools mpileup  -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/input_data/SJRB001_X.subset.bam | bcftools call -m - | tail -n 3
+```
+
+Output: 
+```
+[mpileup] 1 samples in 1 input files
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	H_LC-SJRB001-X-SJ39.3-8L
+1	156044156	.	C	T	67	.	DP=49;VDB=0.525878;SGB=-0.670168;RPB=0.999118;MQB=0.00218214;MQSB=0.948436;BQB=0.743365;MQ0F=0;ICB=1;HOB=0.5;AC=1;AN=2;DP4=15,19,2,8;MQ=52	GT:PL	0/1:102,0,255
+9	19451994	.	G	A	182	.	DP=26;VDB=0.130558;SGB=-0.680642;RPB=0.887078;MQB=0.948139;MQSB=0.955682;BQB=0.053431;MQ0F=0;ICB=1;HOB=0.5;AC=1;AN=2;DP4=5,8,6,6;MQ=58	GT:PL	0/1:215,0,255
+```
+
+After running XenoCP, the host genome variant should be removed as the supporting reads will be unmapped. The following command demonstrates the removal of the variant on chromosome 1 in the output of the sample data.
+
+
+```
+$ bcftools mpileup  -R sample_data/output_data/regions.bed -f ref/GRCh37-lite/GRCh37-lite.fa sample_data/output_data/SJRB001_X.subset.xenocp.bam | bcftools call -m - | tail -n 3
+```
+
+Output: 
+```
+[mpileup] 1 samples in 1 input files
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	H_LC-SJRB001-X-SJ39.3-8L
+1	156044156	.	C	.	285	.	DP=41;MQSB=0.633762;MQ0F=0;AN=2;DP4=16,20,0,0;MQ=57	GT	0/0
+9	19451994	.	G	A	191	.	DP=27;VDB=0.198993;SGB=-0.683931;RPB=0.729125;MQB=0.945959;MQSB=0.960078;BQB=0.0425475;MQ0F=0;ICB=1;HOB=0.5;AC=1;AN=2;DP4=5,8,6,7;MQ=58	GT:PL	0/1:224,0,255
+```
+
+
+[bcftools]: https://samtools.github.io/bcftools/bcftools.html
+[GRCh37-lite]: ftp://ftp.ncbi.nih.gov/genomes/archive/old_genbank/Eukaryotes/vertebrates_mammals/Homo_sapiens/GRCh37/special_requests/GRCh37-lite.fa.gz
+
 
 ## St. Jude Cloud
 
