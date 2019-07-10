@@ -15,14 +15,18 @@ will install all of the dependencies into the container:
 
 	git clone https://github.com/stjude/XenoCP.git
 	cd XenoCP
-	docker build -t xenocp
+	docker build -t xenocp .
 	
-	wget -r http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37
+	wget -r -np -R "index.html*" -nH --cut-dirs=3 http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37
 	
 	# Test run on small dataset
 	mkdir results
-	docker run -t xenocp 
-	cwltool --outdir sample_data_results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
+	docker run \
+	  --mount type=bind,source=$(pwd)/sample_data/input_data,target=/data,readonly \
+	  --mount type=bind,source=$(pwd)/reference,target=/reference,readonly \
+	  --mount type=bind,source=$(pwd)/results,target=/results \
+	  xenocp \
+	  /data/inputs.yml
 	
 ## Introduction to XenoCP
 
@@ -158,7 +162,7 @@ container, not the host, e.g.,
 bam:
   class: File
   path: /data/sample.bam
-ref_db_prefix: /references/ref.fa
+ref_db_prefix: /reference/ref.fa
 ```
 
 The following is an example `run` command where files are stored in `test/{data,references}`. Outputs are saved in `test/results`.
@@ -170,7 +174,7 @@ and run the following command to produce output from the included sample data. T
 $ mkdir $(pwd)/results
 $ docker run \
   --mount type=bind,source=$(pwd)/sample_data/input_data,target=/data,readonly \
-  --mount type=bind,source=/path/to/references,target=/references,readonly \
+  --mount type=bind,source=/path/to/reference,target=/reference,readonly \
   --mount type=bind,source=$(pwd)/results,target=/results \
   xenocp \
   /data/inputs.yml
