@@ -1,7 +1,7 @@
 # XenoCP
 
 XenoCP is a tool for cleansing mouse reads in xenograft BAMs.
-XenoCP can be easily incorporated into any workflow as it takes a BAM file
+XenoCP can be easily incorporated into any workflow, as it takes a BAM file
 as input and efficiently cleans up the mouse contamination and gives a clean
 human BAM output that could be used for downstream genomic analysis. 
 
