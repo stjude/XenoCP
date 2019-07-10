@@ -74,8 +74,6 @@ RUN apt-get update \
 
 RUN pip3 install cwlref-runner html5lib
 
-RUN ln -s /usr/bin/gawk /bin/awk
-
 COPY --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
 COPY --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
 COPY --from=builder /usr/local/bin/sambamba /usr/local/bin/sambamba
