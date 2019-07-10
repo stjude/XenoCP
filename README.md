@@ -184,7 +184,7 @@ ref_db_prefix: /reference/ref.fa
 
 The following is an example `run` command where files are stored in `test/{data,reference}`. Outputs are saved in `test/results`.
 
-This example assumes you are running against Mus Musculus (genome build MGSCv37). Set the path to the folder containing your reference data
+This example assumes you are running against Mus musculus (genome build MGSCv37). Set the path to the folder containing your reference data
 and run the following command to produce output from the included sample data. Test output for comparison is located at `sample_data/output_data`.
 
 ```
