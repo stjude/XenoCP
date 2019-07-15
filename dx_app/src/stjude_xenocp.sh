@@ -43,8 +43,8 @@ main() {
     echo "=== Setup ==="
     echo "  [*] Downloading input files ..."
     mkdir $local_data_dir
-    dx download "$input_bam" -o $local_data_dir/input.bam
-    dx download "$input_bai" -o $local_data_dir/input.bam.bai
+    dx download "$input_bam" -o $local_data_dir/$input_bam_name
+    dx download "$input_bai" -o $local_data_dir/${input_bam_name}.bai
     
     # We allow the user to choose common host genomes from a dropdown
     # (ref_name), with one option being Custom, which needs to be accompanied
@@ -94,7 +94,7 @@ main() {
     cat > $local_data_dir/inputs.yml <<EOF
 bam:
   class: File
-  path: $container_data_dir/input.bam
+  path: $container_data_dir/$input_bam_name
 ref_db_prefix: $container_reference_dir/$reference_prefix
 output_prefix: $output_prefix
 output_extension: $output_extension
