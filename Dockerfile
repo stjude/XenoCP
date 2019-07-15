@@ -6,8 +6,14 @@ RUN apt-get update \
         openjdk-11-jdk-headless \
         unzip \
         wget \
+        python3 \
+        python3-pip \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --user --ignore-installed \
+        cwlref-runner \
+        html5lib
 
 RUN cd /tmp \
     && wget https://github.com/lh3/bwa/releases/download/v0.7.13/bwa-0.7.13.tar.bz2 \
@@ -64,16 +70,17 @@ RUN cd /tmp/xenocp \
 FROM ubuntu:18.04
 
 RUN apt-get update \
-    && apt-get --yes install \
+    && apt-get --yes install --no-install-recommends \
         gawk \
         nodejs \
         openjdk-11-jre-headless \
         python3 \
-        python3-pip \
+        python3-distutils \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install cwlref-runner html5lib
+ENV PATH /root/.local/bin:$PATH
 
+COPY --from=builder /root/.local /root/.local
 COPY --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
 COPY --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
 COPY --from=builder /usr/local/bin/sambamba /usr/local/bin/sambamba
