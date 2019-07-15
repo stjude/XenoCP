@@ -11,4 +11,4 @@ if [ "$#" == 0 ]; then about.sh $0; exit 0; fi
 inputBam=$1
 outputFastq=$2
 
-samtools view -h -F 4 $1 | sam_to_single.awk -v delim=. | java.sh picard.cmdline.PicardCommandLine SamToFastq INPUT=/dev/stdin FASTQ=/dev/stdout VALIDATION_STRINGENCY=SILENT QUIET=true VERBOSITY=ERROR | gzip -c - > ${outputFastq}.gz
+samtools view -h -F 4 $1 | awk -f `which sam_to_single.awk` -v delim=. | java.sh picard.cmdline.PicardCommandLine SamToFastq INPUT=/dev/stdin FASTQ=/dev/stdout VALIDATION_STRINGENCY=SILENT QUIET=true VERBOSITY=ERROR | gzip -c - > ${outputFastq}.gz
