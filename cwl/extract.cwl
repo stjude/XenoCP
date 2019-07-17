@@ -94,7 +94,7 @@ steps:
          type: File
          inputBinding: 
            position: 0
-     arguments: ["-h", "-F", "ref_name =~ /\\*/ and unmapped and mate_is_unmapped", "-f", "bam"]
+     arguments: ["-h", "-F", "ref_name =~ /\\*/", "-f", "bam"]
      outputs:
        unmapped_bam:
          type: File
