@@ -264,7 +264,11 @@ For questions and bug reports, please open an issue on the [GitHub] project page
 
 ## Citing XenoCP
 
-[TODO] Publication in prep
+XenoCP is published in [bioRxiv].
+
+[bioRxiv]: https://www.biorxiv.org/content/10.1101/843250v3
+
+Please cite Rusch M, Ding L, et al. 2019. XenoCP: Cloud-based BAM cleansing tool for RNA and DNA from Xenograft. bioRxiv doi:10.1101/843250.
 
 ## Common Issues
 
