@@ -62,7 +62,7 @@ steps:
     run: extract.cwl
     in: 
       bam: bam
-    out: [split_bams]
+    out: [split_bams, unmapped_bams]
   
   # Step02: extract mapped reads and convert to fastq
   mapped-fastq:
@@ -123,7 +123,9 @@ steps:
   finish:
     run: merge_markdup_index.cwl
     in:
-      input_bams: cleanse/cleaned_bam
+      input_bams: 
+        source: [cleanse/cleaned_bam, split/unmapped_bams]
+        linkMerge: merge_flattened 
       output_bam:
         source: bam
         valueFrom: ${return self.nameroot + ".xenocp.bam"}
@@ -157,4 +159,4 @@ $namespaces:
   s: http://schema.org/
 
 $schemas:
- - https://schema.org/version/latest/schema.rdf
+ - https://schema.org/version/latest/schemaorg-all-http.rdf
