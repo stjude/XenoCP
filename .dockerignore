@@ -1,3 +1,4 @@
 .gradle/
 build/
 tmp/
+sample_data/
