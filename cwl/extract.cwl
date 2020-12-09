@@ -18,6 +18,9 @@ outputs:
     type: File[]
     outputSource: [by_chrom/out_bam, mismatch/out_bam]
     linkMerge: merge_flattened
+  unmapped:
+    type: File
+    outputSource: [extract_unmapped/unmapped_bam] 
 
 steps:
   # Step01: extract chromosome information from input bam
@@ -27,6 +30,7 @@ steps:
     out: [chroms]
     run: get_chroms.cwl  
 
+  # Step02a: extract reads where mate is mapped to a different chromosome
   mismatch: 
     in:
       bam: bam
@@ -77,4 +81,24 @@ steps:
            glob: "$(inputs.chroms).bam"
       baseCommand: [java.sh, org.stjude.compbio.sam.TweakSam]
 
+  # Step02c: extract unmapped read pairs
+  extract_unmapped:
+   in:
+     bam: bam
+   out: [unmapped_bam]
+   run: 
+     class: CommandLineTool
+     stdout: unmapped.bam
+     inputs: 
+       bam: 
+         type: File
+         inputBinding: 
+           position: 0
+     arguments: ["-h", "-F", "ref_name =~ /\\*/", "-f", "bam"]
+     outputs:
+       unmapped_bam:
+         type: File
+         outputBinding:
+           glob: "*.bam"
+     baseCommand: [sambamba, view]
 

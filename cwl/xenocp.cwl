@@ -62,7 +62,7 @@ steps:
     run: extract.cwl
     in: 
       bam: bam
-    out: [split_bams]
+    out: [split_bams, unmapped]
   
   # Step02: extract mapped reads and convert to fastq
   mapped-fastq:
@@ -123,7 +123,9 @@ steps:
   finish:
     run: merge_markdup_index.cwl
     in:
-      input_bams: cleanse/cleaned_bam
+      input_bams: 
+        source: [cleanse/cleaned_bam, split/unmapped]
+        linkMerge: merge_flattened
       output_bam:
         source: bam
         valueFrom: ${return self.nameroot + ".xenocp.bam"}
