@@ -2,3 +2,4 @@ bam:
   class: File
   path: /data/SJRB001_X.subset.bam
 ref_db_prefix: /reference/MGSCv37/MGSCv37.fa
+aligner: "bwa aln"

@@ -21,7 +21,7 @@ inputs:
   aligner:
     type: 
       type: enum
-      symbols: ["bwa aln", "bwa mem"]
+      symbols: ["bwa aln", "bwa mem", "star"]
       name: aligner
   # See doc in split_sam.cwl for the meaning of the following arguments
   suffix_length:
@@ -114,6 +114,23 @@ steps:
       ResourceRequirement:
         ramMin: 4800
         coresMin: 1
+  
+  # Step03c: map extacted reads to the contamination genome with STAR
+  mapping-star:
+    run: star_onlymapped.cwl
+    when: $(inputs.aligner == "star")
+    in:
+      aligner: aligner
+      ref_db_prefix: ref_db_prefix
+      input_fastq: mapped-fastq/fastq
+      output_bam:
+        valueFrom: $(inputs.input_fastq.nameroot).contam.bam
+    scatter: [input_fastq]
+    out: [bam]
+    hints:
+      ResourceRequirement:
+        ramMin: 4800
+        coresMin: 1
 
   # Step04: find contamination reads
   contamination:
@@ -126,7 +143,7 @@ steps:
       tie_bam:
         valueFrom: $(inputs.input_bam.nameroot).tie.bam
       contam_bams: 
-        source: [mapping-bwa-aln/bam, mapping-bwa-mem/bam]
+        source: [mapping-bwa-aln/bam, mapping-bwa-mem/bam, mapping-star/bam]
         linkMerge: merge_flattened
         pickValue: all_non_null
     scatter: [input_bam, contam_bams]
