@@ -81,7 +81,7 @@ steps:
     scatter: [input_bam]
     out: [fastq]
 
-  # Step03a: map extacted reads to the contamination genome with bwa aln
+  # Step03a: map extracted reads to the contamination genome with bwa aln
   mapping-bwa-aln:
     run: bwa_alignse_onlymapped.cwl
     when: $(inputs.aligner == "bwa aln")
@@ -98,7 +98,7 @@ steps:
         ramMin: 4800
         coresMin: 1
 
-  # Step03b: map extacted reads to the contamination genome with bwa mem
+  # Step03b: map extracted reads to the contamination genome with bwa mem
   mapping-bwa-mem:
     run: bwa_mem_onlymapped.cwl
     when: $(inputs.aligner == "bwa mem")
@@ -115,7 +115,7 @@ steps:
         ramMin: 4800
         coresMin: 1
   
-  # Step03c: map extacted reads to the contamination genome with STAR
+  # Step03c: map extracted reads to the contamination genome with STAR
   mapping-star:
     run: star_onlymapped.cwl
     when: $(inputs.aligner == "star")
