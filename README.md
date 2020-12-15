@@ -42,6 +42,7 @@ XenoCP workflow:
 ## Prerequisites
 
   * [bwa] =0.7.13
+  * [STAR] =2.7.1a
   * [gawk]*
   * [Java SE Development Kit] ~1.8
     * [Gradle] ~5.3
@@ -60,6 +61,7 @@ XenoCP workflow:
 disabled.
 
 [bwa]: https://github.com/lh3/bwa
+[STAR]: https://github.com/alexdobin/STAR
 [gawk]: https://www.gnu.org/software/gawk/
 [Java SE Development Kit]: https://www.oracle.com/technetwork/java/javase/overview/index.html
 [Gradle]: https://gradle.org/
@@ -96,21 +98,30 @@ Add the artifacts under `build/install/xenocp/bin` to your `PATH`.
 
 ### Inputs
 
-XenoCP requires two inputs, defined in a YAML file as [CWL inputs]. E.g., `inputs.yml`:
+XenoCP requires three inputs, defined in a YAML file as [CWL inputs]. E.g., `inputs.yml`:
 
 ```
 bam:
   class: File
   path: sample.bam
 ref_db_prefix: /references/ref.fa
+aligner: "bwa aln"
 ```
 
-`bam` is the input sample BAM 
- and `ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
-For example, a prefix of `MGSCv37.fa` would assume
+`bam` is the input sample BAM.
+ `ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
+For example, a prefix of `MGSCv37.fa` would assume for bwa alignment that
 the following files in the same directory exist: 
 `MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, 
 `MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
+For STAR alignment, it would assume the following file exist in the same directory: 
+`chrLength.txt`, `chrNameLength.txt`, `chrName.txt`, `chrStart.txt`, 
+`exonGeTrInfo.tab`, `exonInfo.tab`, `geneInfo.tab`, `Genome`,
+`genomeParameters.txt`, `SA`, `SAindex`, `sjdbInfo.txt`,
+`sjdbList.fromGTF.out.tab`, `sjdbList.out.tab`, and `transcriptInfo.tab`.
+ The `aligner` option specifies the mapping algorithm to use for aligning 
+ to the host genome, currently supported options are
+ `bwa aln`, `bwa mem`, and `star`. 
 
 Several optional input paramters can be changed in the inputs file.
 
@@ -125,8 +136,14 @@ output_extension: bam
 ### Create Reference Files
 
 Download the FASTA file for your genome assembly and run the following commands to create other files:
+#### BWA reference files
 ```
 $ bwa index -p $FASTA $FASTA
+```
+#### STAR reference files
+In addition the genomic FASTA, STAR reference should use an annotation file (e.g. gencode).
+```
+$ STAR --runMode genomeGenerate --genomeDir STAR --genomeFastaFiles $FASTA --sjdbGTFfile $ANNOTATION --sjdbOverhang 125
 ```
 
 [CWL inputs]: https://www.commonwl.org/user_guide/02-1st-example/index.html
@@ -180,6 +197,7 @@ bam:
   class: File
   path: /data/sample.bam
 ref_db_prefix: /reference/ref.fa
+aligner: "bwa aln"
 ```
 
 The following is an example `run` command where files are stored in `test/{data,reference}`. Outputs are saved in `test/results`.
