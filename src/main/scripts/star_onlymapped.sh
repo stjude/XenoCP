@@ -62,7 +62,7 @@ cmd="STAR --genomeDir ${GENOMEDIR} \
              --outFilterScoreMinOverLread 0.66 \
              --outFileNamePrefix ${name}. \
              --twopassMode Basic \
-             --limitBAM 3000000000 \
+             --limitBAMsortRAM 3000000000 \
             && java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o ${BAM} -i ${name}.Aligned.out.bam"
 
 echo $cmd 
