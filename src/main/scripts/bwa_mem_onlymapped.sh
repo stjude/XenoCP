@@ -1,5 +1,5 @@
 #!/bin/bash
-# Performs bwa aln and bwa samse to align to a reference, converts to bam, and
+# Performs bwa mem to align to a reference, converts to bam, and
 # filters out all records for unmapped reads.
 #
 # $1 = reference db prefix
@@ -26,17 +26,11 @@ if [ "$OUT_DIR" != "" -a ! -e "$OUT_DIR" ]; then mkdir -p $OUT_DIR; fi
 # Create temp dir to hold intermediate files
 SCRATCH=`mktemp -d` || ( echo "Could not get scratch dir" >&2 ; exit 1 )
 
+# bwa mem
+cmd="bwa mem $PREFIX $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o $BAM"
+
+echo $cmd 
 set -e -x
-
-# bwa aln
-cmd="bwa aln $PREFIX $FASTQ"
-sai=$SCRATCH/`basename $BAM .bam`.sai
-echo $cmd \> $sai
-$cmd > $sai
-
-# bwa samse | TweakSam
-cmd="bwa samse $PREFIX $sai $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o $BAM"
-echo "$cmd"
 eval $cmd
 
 # Remove scratch dir

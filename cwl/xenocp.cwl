@@ -1,5 +1,5 @@
 #!/usr/bin/env cwl-runner
-cwlVersion: v1.0
+cwlVersion: v1.2
 class: Workflow
 
 requirements:
@@ -18,6 +18,11 @@ inputs:
   ref_db_prefix:
     type: string
     label: contamination genome reference db prefix
+  aligner:
+    type: 
+      type: enum
+      symbols: ["bwa aln", "bwa mem", "star"]
+      name: aligner
   # See doc in split_sam.cwl for the meaning of the following arguments
   suffix_length:
     type: int?
@@ -76,10 +81,46 @@ steps:
     scatter: [input_bam]
     out: [fastq]
 
-  # Step03: mapped extacted reads to the contamination genome
-  mapping:
+  # Step03a: map extracted reads to the contamination genome with bwa aln
+  mapping-bwa-aln:
     run: bwa_alignse_onlymapped.cwl
+    when: $(inputs.aligner == "bwa aln")
     in:
+      aligner: aligner
+      ref_db_prefix: ref_db_prefix
+      input_fastq: mapped-fastq/fastq
+      output_bam:
+        valueFrom: $(inputs.input_fastq.nameroot).contam.bam
+    scatter: [input_fastq]
+    out: [bam]
+    hints:
+      ResourceRequirement:
+        ramMin: 4800
+        coresMin: 1
+
+  # Step03b: map extracted reads to the contamination genome with bwa mem
+  mapping-bwa-mem:
+    run: bwa_mem_onlymapped.cwl
+    when: $(inputs.aligner == "bwa mem")
+    in:
+      aligner: aligner
+      ref_db_prefix: ref_db_prefix
+      input_fastq: mapped-fastq/fastq
+      output_bam:
+        valueFrom: $(inputs.input_fastq.nameroot).contam.bam
+    scatter: [input_fastq]
+    out: [bam]
+    hints:
+      ResourceRequirement:
+        ramMin: 4800
+        coresMin: 1
+  
+  # Step03c: map extracted reads to the contamination genome with STAR
+  mapping-star:
+    run: star_onlymapped.cwl
+    when: $(inputs.aligner == "star")
+    in:
+      aligner: aligner
       ref_db_prefix: ref_db_prefix
       input_fastq: mapped-fastq/fastq
       output_bam:
@@ -101,7 +142,10 @@ steps:
         valueFrom: $(inputs.input_bam.nameroot).contam.txt
       tie_bam:
         valueFrom: $(inputs.input_bam.nameroot).tie.bam
-      contam_bams: mapping/bam
+      contam_bams: 
+        source: [mapping-bwa-aln/bam, mapping-bwa-mem/bam, mapping-star/bam]
+        linkMerge: merge_flattened
+        pickValue: all_non_null
     scatter: [input_bam, contam_bams]
     scatterMethod: dotproduct
     out: [contam_list, output_tie_bam]
