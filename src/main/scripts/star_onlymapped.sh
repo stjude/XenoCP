@@ -31,11 +31,11 @@ name=$(basename $BAM ".bam")
 
 # Ensure reads are not compressed
 reads=$(readlink -f ${FASTQ})
-if [ $(file ${reads} | grep -c "gzip compressed data") -eq 1 ]
+if file ${reads} | grep -c "gzip compressed data"
 then
     gzip -dc ${reads} > reads.fq
     reads="reads.fq"
-elif [ $(file ${reads} | grep -c "bzip2 compressed data") -eq 1 ]
+elif file ${reads} | grep -c "bzip2 compressed data"
 then
     bzip2 -dc ${reads} > reads.fq
     reads="reads.fq"
@@ -65,10 +65,10 @@ cmd="STAR --genomeDir ${GENOMEDIR} \
              --limitBAMsortRAM 3000000000 \
             && java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o ${BAM} -i ${name}.Aligned.out.bam"
 
-echo $cmd 
-if ! eval "$cmd"
-then echo "STAR | TweakSam failed" >&2 ; exit 1
-fi
+echo $cmd
+set -e -x
+eval $cmd
+
 
 # Remove scratch dir
 rm -rf $SCRATCH

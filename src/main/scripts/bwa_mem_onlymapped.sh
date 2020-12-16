@@ -30,9 +30,8 @@ SCRATCH=`mktemp -d` || ( echo "Could not get scratch dir" >&2 ; exit 1 )
 cmd="bwa mem $PREFIX $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o $BAM"
 
 echo $cmd 
-if ! eval "$cmd"
-then echo "bwa mem | TweakSam failed" >&2 ; exit 1
-fi
+set -e -x
+eval $cmd
 
 # Remove scratch dir
 rm -rf $SCRATCH
