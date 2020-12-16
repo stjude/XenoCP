@@ -109,12 +109,13 @@ aligner: "bwa aln"
 ```
 
 `bam` is the input sample BAM.
- `ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
+`ref_db_prefix`, the basename of the reference assembly that should be cleansed. 
 For example, a prefix of `MGSCv37.fa` would assume for bwa alignment that
 the following files in the same directory exist: 
 `MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, 
 `MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
-For STAR alignment, it would assume the following file exist in the same directory: 
+For STAR alignment, `ref_db_prefix` should be a directory and 
+it would assume the following files exist in the directory: 
 `chrLength.txt`, `chrNameLength.txt`, `chrName.txt`, `chrStart.txt`, 
 `exonGeTrInfo.tab`, `exonInfo.tab`, `geneInfo.tab`, `Genome`,
 `genomeParameters.txt`, `SA`, `SAindex`, `sjdbInfo.txt`,
