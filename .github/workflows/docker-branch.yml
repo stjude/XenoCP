@@ -20,6 +20,6 @@ jobs:
     - name: Build and push docker images
       run: |
         tag=branch-${GITHUB_REF##*/}
-        docker build -t stjude/xenocp:"$tag"
+        docker build -t stjude/xenocp:"$tag" .
         docker push stjude/xenocp:"$tag"
         docker rmi stjude/xenocp:"$tag"

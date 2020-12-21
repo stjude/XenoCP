@@ -17,6 +17,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build and push docker images
       run: |
-        docker build -t stjude/xenocp:latest
+        docker build -t stjude/xenocp:latest .
         docker push stjude/xenocp:latest
         docker rmi stjude/xenocp:latest
