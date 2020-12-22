@@ -9,14 +9,11 @@ jobs:
   docker_build_master:
     runs-on: ubuntu-latest
     steps:
-    - uses: azure/docker-login@v1
+    - uses: actions/checkout@v2
+    - name: Push to Docker Hub
+      uses: docker/build-push-action@v1
       with:
-        login-server: https://index.docker.io/v1/
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - uses: actions/checkout@v2
-    - name: Build and push docker images
-      run: |
-        docker build -t stjude/xenocp:latest .
-        docker push stjude/xenocp:latest
-        docker rmi stjude/xenocp:latest
+        repository: stjude/xenocp
+        tag_with_ref: true 

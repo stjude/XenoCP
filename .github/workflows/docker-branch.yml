@@ -11,15 +11,12 @@ jobs:
   docker_build_branch:
     runs-on: ubuntu-latest
     steps:
-    - uses: azure/docker-login@v1
+    - name: Check out the repo
+      uses: actions/checkout@v2
+    - name: Push to Docker Hub
+      uses: docker/build-push-action@v1
       with:
-        login-server: https://index.docker.io/v1/
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - uses: actions/checkout@v2
-    - name: Build and push docker images
-      run: |
-        tag=branch-${GITHUB_REF##*/}
-        docker build -t stjude/xenocp:"$tag" .
-        docker push stjude/xenocp:"$tag"
-        docker rmi stjude/xenocp:"$tag"
+        repository: stjude/xenocp
+        tags: branch-${GITHUB_REF##*/}
