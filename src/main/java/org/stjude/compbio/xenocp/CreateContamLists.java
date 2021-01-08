@@ -262,7 +262,7 @@ public class CreateContamLists {
 			"read number in the pair.\n\n" +
 			"CAVEAT: All bams must have the NM tag, containing edit\n" +
 			"distance!\n\n" + 
-			"CAVEAT: All contamination bams must be sorted by queryname");
+			"CAVEAT: All contamination bams must be sorted by queryname\n\n");
 		System.exit(exitcode);
 	}
 
