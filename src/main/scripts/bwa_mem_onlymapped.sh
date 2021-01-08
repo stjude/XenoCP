@@ -27,7 +27,7 @@ if [ "$OUT_DIR" != "" -a ! -e "$OUT_DIR" ]; then mkdir -p $OUT_DIR; fi
 SCRATCH=`mktemp -d` || ( echo "Could not get scratch dir" >&2 ; exit 1 )
 
 # bwa mem
-cmd="bwa mem $PREFIX $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o $BAM"
+cmd="bwa mem $PREFIX $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -O queryname -o $BAM"
 
 echo $cmd 
 set -e -x
