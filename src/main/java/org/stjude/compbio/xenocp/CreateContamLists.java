@@ -261,7 +261,8 @@ public class CreateContamLists {
 			"suffix of [non-alphanumeric char][12] that indicates\n" +
 			"read number in the pair.\n\n" +
 			"CAVEAT: All bams must have the NM tag, containing edit\n" +
-			"distance!");
+			"distance!\n\n" + 
+			"CAVEAT: All contamination bams must be sorted by queryname\n\n");
 		System.exit(exitcode);
 	}
 

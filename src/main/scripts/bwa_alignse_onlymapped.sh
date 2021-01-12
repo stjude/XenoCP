@@ -35,7 +35,7 @@ echo $cmd \> $sai
 $cmd > $sai
 
 # bwa samse | TweakSam
-cmd="bwa samse $PREFIX $sai $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -o $BAM"
+cmd="bwa samse $PREFIX $sai $FASTQ | java.sh org.stjude.compbio.sam.TweakSam -V SILENT -G 4 -O queryname -o $BAM"
 echo "$cmd"
 eval $cmd
 
