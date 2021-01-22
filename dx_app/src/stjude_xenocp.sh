@@ -71,7 +71,6 @@ main() {
         mv $local_reference_dir/BWA/* $local_reference_dir/
       else
         dx download -o $local_reference_dir -r project-FzJ7yx89Q0f0pBj5P2j1g0vB:/$ref_name/STAR
-        #mv $local_reference_dir/STAR/* $local_reference_dir
         reference_prefix="STAR"
       fi
     else
