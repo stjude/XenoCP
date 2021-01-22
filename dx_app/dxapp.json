@@ -67,6 +67,15 @@
       "optional": true,
       "default": "bam",
       "help": ""
+    },
+    {
+      "name": "aligner",
+      "label": "Alignment algorithm for host check",
+      "class": "string",
+      "choices": ["bwa aln", "bwa mem", "star"],
+      "optional": true,
+      "default": "bwa aln",
+      "help": ""
     }
   ],
   "outputSpec": [

@@ -25,6 +25,7 @@ main() {
     echo "Value of ref_bwa_index_tgz: '$ref_bwa_index_tgz'"
     echo "Value of output_prefix: '$output_prefix'"
     echo "Value of output_extension: '$output_extension'"
+    echo "Value of aligner:  '$aligner'"
     
     # This tool uses three directories: data, reference, output, and each has
     # to exist locally and also be bound to a path within the container.  All
@@ -55,6 +56,7 @@ main() {
     # unambiguously determined in those cases.
     echo "  [*] Downloading reference files ..."
     mkdir $local_reference_dir
+    reference_prefix=
     if [ "$ref_name" != "" -a ${ref_name:0:6} != "Custom" ]
     then
       if [ "$ref_bwa_index_tgz" != "" ]
@@ -63,8 +65,15 @@ main() {
         echo "A custom host genome was provided but Host Genome was not set to custom." >&2
         exit 1
       fi
-      dx download -o $local_reference_dir -r project-F5444K89PZxXjBqVJ3Pp79B4:/global/reference/Mus_musculus/$ref_name/BWA
-      mv $local_reference_dir/BWA/* $local_reference_dir/
+      if [  ${aligner:0:3} == "bwa" ]
+      then
+        dx download -o $local_reference_dir -r project-F5444K89PZxXjBqVJ3Pp79B4:/global/reference/Mus_musculus/$ref_name/BWA
+        mv $local_reference_dir/BWA/* $local_reference_dir/
+      else
+        dx download -o $local_reference_dir -r project-FzJ7yx89Q0f0pBj5P2j1g0vB:/$ref_name/STAR
+        #mv $local_reference_dir/STAR/* $local_reference_dir
+        reference_prefix="STAR"
+      fi
     else
       if [ "$ref_bwa_index_tgz" == "" ]
       then
@@ -78,9 +87,12 @@ main() {
         tar xzf *
       )
     fi
-    reference_prefix=`cd $local_reference_dir; echo *.bwt | sed 's/.bwt$//'`
-    if ! ls $local_reference_dir/$reference_prefix*
-    then echo "Problem obtaining bwa index" >&2; exit 1
+    if [ "$reference_prefix" != "STAR" ]
+    then
+      reference_prefix=`cd $local_reference_dir; echo *.bwt | sed 's/.bwt$//'`
+      if ! ls $local_reference_dir/$reference_prefix*
+      then echo "Problem obtaining bwa index" >&2; exit 1
+      fi
     fi
 
     echo "  [*] Printing instance information ..."
@@ -98,6 +110,7 @@ bam:
 ref_db_prefix: $container_reference_dir/$reference_prefix
 output_prefix: $output_prefix
 output_extension: $output_extension
+aligner: $aligner
 EOF
 
     echo "  [*] Loading container image ..."
