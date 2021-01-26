@@ -27,14 +27,15 @@
 
 version 1.0
 
-import "../../tools/xenocp.wdl" as xenocp_tools
-import "../../tools/bwa.wdl"
+import "../tools/xenocp.wdl" as xenocp_tools
+import "https://raw.githubusercontent.com/stjudecloud/workflows/bwa_alignment/tools/bwa.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/fastq_alignment/tools/star.wdl"
 
 workflow xenocp {
     input {
         File input_bam
         File input_bai
-        File bwadb_tar_gz
+        File reference_tar_gz
         String aligner = "bwa aln"
         Int suffix_length = 4
         Boolean keep_mates_together = true
@@ -45,7 +46,9 @@ workflow xenocp {
     }
 
     parameter_meta {
-
+        input_bam: "BAM file from which to clean contaminate reads"
+        reference_tar_gz: "Reference gzipped tar file containing either STAR or BWA indexes depending on which aligner is selected. For BWA, files should be at the root level. For STAR, files should be in a directory that matches the root of the gzipped archive."
+        aligner: "Which aligner to use to map reads to the host genome to detect contamination: [bwa aln, bwa mem, star]"
     }
 
     String name = basename(input_bam, ".bam") + ".xenocp.bam"
@@ -62,12 +65,23 @@ workflow xenocp {
     scatter (bam in split_bams){
         call xenocp_tools.mapped_fastq { input: input_bam=bam }
     }
-
-    scatter (fastq in mapped_fastq.fastq){
-        call bwa.bwa_aln as align { input: fastq=fastq, bwadb_tar_gz=bwadb_tar_gz }
+    if (aligner == "bwa aln") {
+        scatter (fastq in mapped_fastq.fastq){
+            call bwa.bwa_aln as bwa_aln_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz }
+        }
     }
-
-    scatter (pair in zip(split_bams, align.bam)){
+    if (aligner == "bwa mem") {
+        scatter (fastq in mapped_fastq.fastq){
+            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz }
+        }
+    }
+    if (aligner == "star") {
+        scatter (fastq in mapped_fastq.fastq){
+            call star.alignment as star_align { input: read_one_fastqs=[fastq], stardb_tar_gz=reference_tar_gz, output_prefix=basename(fastq, ".fq.gz") }
+        }
+    }
+    
+    scatter (pair in zip(split_bams, select_first([bwa_aln_align.bam, bwa_mem_align.bam, star_align.star_bam]))){
         call xenocp_tools.create_contam_list { input: input_bam=pair.left, contam_bam=pair.right }
     }
 
