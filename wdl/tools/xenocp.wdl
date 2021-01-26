@@ -35,7 +35,7 @@ task get_chroms {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/tweaksam:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -87,7 +87,7 @@ task extract_mismatch {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/tweaksam:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -139,7 +139,7 @@ task extract_by_chrom {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/tweaksam:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -190,7 +190,7 @@ task extract_unmapped {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/tweaksam:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -241,7 +241,7 @@ task mapped_fastq {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/xenocp:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -286,7 +286,7 @@ task create_contam_list {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/xenocp:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -332,7 +332,7 @@ task cleanse {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/xenocp:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -381,7 +381,7 @@ task merge_markdup_index {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/xenocp:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -428,7 +428,7 @@ task qc {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjudecloud/xenocp:1.0.0'
+        docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
