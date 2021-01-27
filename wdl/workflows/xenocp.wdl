@@ -30,6 +30,7 @@ version 1.0
 import "../tools/xenocp.wdl" as xenocp_tools
 import "https://raw.githubusercontent.com/stjudecloud/workflows/bwa_alignment/tools/bwa.wdl"
 import "https://raw.githubusercontent.com/stjudecloud/workflows/fastq_alignment/tools/star.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/picard.wdl"
 
 workflow xenocp {
     input {
@@ -81,7 +82,11 @@ workflow xenocp {
         }
     }
     
-    scatter (pair in zip(split_bams, select_first([bwa_aln_align.bam, bwa_mem_align.bam, star_align.star_bam]))){
+    scatter(bam in select_first([bwa_aln_align.bam, bwa_mem_align.bam, star_align.star_bam])){
+        call picard.sort as sort { input: bam=bam, sort_order="queryname"}
+    }
+
+    scatter (pair in zip(split_bams, sort.sorted_bam)){
         call xenocp_tools.create_contam_list { input: input_bam=pair.left, contam_bam=pair.right }
     }
 
