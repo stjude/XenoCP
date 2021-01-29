@@ -327,7 +327,7 @@ task cleanse {
 
     parameter_meta {
         input_bam: "BAM file to cleanse of contaminant reads"
-        unmap_reads: "The list of read namess to unmap in the input BAM"
+        unmap_reads: "The list of read names to unmap in the input BAM"
         sort_order: "Ordering of reads in output BAM: [queryname, coordinate, unsorted]"
     }
 }
