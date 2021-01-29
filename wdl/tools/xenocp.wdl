@@ -28,7 +28,7 @@ task get_chroms {
             n_cores=$(nproc)
         fi
 
-        samtools view -H ~{input_bam} | grep "@SQ" | cut -f 2  | cut -f 2 -d':' > chroms.txt
+        samtools view -H ~{input_bam} -@ ${n_cores}| grep "@SQ" | cut -f 2  | cut -f 2 -d':' > chroms.txt
     >>>
 
     runtime {
@@ -47,7 +47,7 @@ task get_chroms {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs TweakSam to extract reads with mate mapped to a different chromosome." 
+        description: "This WDL tool runs samtools to get the list of chromosomes present in the input bam."
     }
 
     parameter_meta {
@@ -57,27 +57,18 @@ task get_chroms {
 
 task extract_mismatch {
     input {
-        Int ncpu = 1
         File input_bam
         File input_bai
         Int memory_gb = 1
         Int? disk_size_gb
         Int max_retries = 1
-        Boolean detect_nproc = false
     }
 
-    String parsed_detect_nproc = if detect_nproc then "true" else ""
     Float input_bam_size = size(input_bam, "GiB")
     Int disk_size = select_first([disk_size_gb, ceil(input_bam_size * 2)])
 
     command <<<
         set -euo pipefail
-
-        n_cores=~{ncpu}
-        if [ -n ~{parsed_detect_nproc} ]
-        then
-            n_cores=$(nproc)
-        fi
 
         java.sh org.stjude.compbio.sam.TweakSam -x -O "queryname" -o "other.bam" -i ~{input_bam}
 
@@ -86,7 +77,7 @@ task extract_mismatch {
     runtime {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
-        cpu: ncpu
+        cpu: 1
         docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
@@ -103,33 +94,25 @@ task extract_mismatch {
 
     parameter_meta {
         input_bam: "Input BAM file from which to extract"
+        input_bai: "BAM index corresponding to input_bam"
     }
 }
 
 task extract_by_chrom {
     input {
-        Int ncpu = 1
         File input_bam
         File input_bai
         String chromosome
         Int memory_gb = 1
         Int? disk_size_gb
         Int max_retries = 1
-        Boolean detect_nproc = false
     }
 
-    String parsed_detect_nproc = if detect_nproc then "true" else ""
     Float input_bam_size = size(input_bam, "GiB")
     Int disk_size = select_first([disk_size_gb, ceil(input_bam_size * 2)])
 
     command <<<
         set -euo pipefail
-
-        n_cores=~{ncpu}
-        if [ -n ~{parsed_detect_nproc} ]
-        then
-            n_cores=$(nproc)
-        fi
 
         java.sh org.stjude.compbio.sam.TweakSam -X -O "queryname" -o "~{chromosome}.bam" -c ~{chromosome} -i ~{input_bam}
 
@@ -138,7 +121,7 @@ task extract_by_chrom {
     runtime {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
-        cpu: ncpu
+        cpu: 1
         docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
@@ -155,6 +138,8 @@ task extract_by_chrom {
 
     parameter_meta {
         input_bam: "Input BAM file from which to extract"
+        input_bai: "BAM index corresponding to input_bam"
+        chromosome: "Chromosome for which to extract reads"
     }
 }
 
@@ -182,7 +167,7 @@ task extract_unmapped {
             n_cores=$(nproc)
         fi
 
-        sambamba view -h -F "ref_name =~ /\\*/" -f "bam" ~{input_bam} > unmapped.bam
+        sambamba view -t ${n_cores} -h -F "ref_name =~ /\\*/" -f "bam" ~{input_bam} > unmapped.bam
 
     >>>
 
@@ -201,11 +186,12 @@ task extract_unmapped {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs TweakSam to extract reads with mate mapped to a different chromosome." 
+        description: "This WDL tool runs TweakSam to extract unmapped reads."
     }
 
     parameter_meta {
         input_bam: "Input BAM file from which to extract"
+        input_bai: "BAM index file corresponding to input_bam"
     }
 }
 
@@ -213,26 +199,16 @@ task mapped_fastq {
     input {
         File input_bam
         String output_fastq = basename(input_bam, ".bam") + ".fastq"
-        Int ncpu = 1
         Int memory_gb = 1
         Int? disk_size_gb
         Int max_retries = 1
-        Boolean detect_nproc = false
     }
 
-
-    String parsed_detect_nproc = if detect_nproc then "true" else ""
     Float input_bam_size = size(input_bam, "GiB")
     Int disk_size = select_first([disk_size_gb, ceil(input_bam_size + 2)])
 
     command <<<
         set -euo pipefail
-
-        n_cores=~{ncpu}
-        if [ -n ~{parsed_detect_nproc} ]
-        then
-            n_cores=$(nproc)
-        fi
 
         view_awk_picard.sh ~{input_bam} ~{output_fastq}
     >>>
@@ -240,7 +216,7 @@ task mapped_fastq {
     runtime {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
-        cpu: ncpu
+        cpu: 1
         docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
@@ -256,7 +232,8 @@ task mapped_fastq {
     }
 
     parameter_meta {
-        input_bam: "Input BAM file from which to extract"
+        input_bam: "Input BAM file to convert to FastQ"
+        output_fastq: "Name of FastQ file to which to write reads"
     }
 }
 
@@ -269,7 +246,6 @@ task create_contam_list {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int ncpu = 1
         Int memory_gb = 1
     }
 
@@ -285,7 +261,7 @@ task create_contam_list {
     runtime {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
-        cpu: ncpu
+        cpu: 1
         docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
@@ -302,7 +278,11 @@ task create_contam_list {
     }
 
     parameter_meta {
-        input_bam: "Input BAM file"
+        input_bam: "Input BAM file to check for contamination"
+        contam_bam: "BAM mapped to contaminant genome. Will be searched for better alignments."
+        tie_bam: "Output BAM with mapping ties, e.g. neither alignment is clearly better"
+        output_contam_list: "File to which to write contaminant read names"
+        stringency: "BAM validation stringency: [STRICT, LENIENT, SILENT]"
     }
 }
 
@@ -315,7 +295,6 @@ task cleanse {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int ncpu = 1
         Int memory_gb = 1
     }
 
@@ -331,7 +310,7 @@ task cleanse {
     runtime {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
-        cpu: ncpu
+        cpu: 1
         docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
@@ -347,7 +326,9 @@ task cleanse {
     }
 
     parameter_meta {
-        input_bam: "Input BAM file"
+        input_bam: "BAM file to cleanse of contaminant reads"
+        unmap_reads: "The list of read namess to unmap in the input BAM"
+        sort_order: "Ordering of reads in output BAM: [queryname, coordinate, unsorted]"
     }
 }
 
@@ -399,7 +380,8 @@ task merge_markdup_index {
     }
 
     parameter_meta {
-        input_bams: "Input BAM files"
+        input_bams: "Input BAM files to merge, mark duplicates, and index"
+        skip_dup: "Skip duplicate marking"
     }
 }
 
