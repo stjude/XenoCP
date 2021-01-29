@@ -339,7 +339,6 @@ task merge_markdup_index {
         String output_bam = "xenocp.bam"
         Int? disk_size_gb
         Int max_retries = 1
-        Int ncpu = 1
         Int memory_gb = 1
     }
 
@@ -355,13 +354,13 @@ task merge_markdup_index {
             dup_opt="--no-markdup"
         fi
 
-        merge_markdup_index.sh ${dup_opt} -t ~{ncpu} ~{output_bam} ~{sep=" " input_bams}
+        merge_markdup_index.sh ${dup_opt} ~{output_bam} ~{sep=" " input_bams}
     >>>
 
     runtime {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
-        cpu: ncpu
+        cpu: 1
         docker: 'stjude/xenocp:latest'
         maxRetries: max_retries
     }
