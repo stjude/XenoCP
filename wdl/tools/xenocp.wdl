@@ -274,7 +274,7 @@ task create_contam_list {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs creates a list of contamination reads by comparing host alignments to original alignments." 
+        description: "This WDL tool creates a list of contamination reads by comparing host alignments to original alignments." 
     }
 
     parameter_meta {
