@@ -38,11 +38,7 @@ workflow xenocp {
         File input_bai
         File reference_tar_gz
         String aligner = "bwa aln"
-        Int suffix_length = 4
-        Boolean keep_mates_together = true
         String validation_stringency = "SILENT"
-        String output_prefix = "xenocp-"
-        String output_extension = "bam"
         Int n_threads = 1
     }
 
@@ -54,12 +50,12 @@ workflow xenocp {
 
     String name = basename(input_bam, ".bam") + ".xenocp.bam"
 
-    call xenocp_tools.get_chroms { input: input_bam=input_bam }
+    call xenocp_tools.get_chroms { input: input_bam=input_bam, ncpu=n_threads }
     call xenocp_tools.extract_mismatch as mismatch { input: input_bam=input_bam, input_bai=input_bai }
     scatter (chromosome in get_chroms.chromosomes) {
         call xenocp_tools.extract_by_chrom { input: input_bam=input_bam, input_bai=input_bai, chromosome=chromosome }
     }
-    call xenocp_tools.extract_unmapped as unmapped { input: input_bam=input_bam, input_bai=input_bai }
+    call xenocp_tools.extract_unmapped as unmapped { input: input_bam=input_bam, input_bai=input_bai, ncpu=n_threads }
 
     Array[File] split_bams = flatten([extract_by_chrom.out_bam, [mismatch.mismatch_bam]])
 
@@ -68,17 +64,17 @@ workflow xenocp {
     }
     if (aligner == "bwa aln") {
         scatter (fastq in mapped_fastq.fastq){
-            call bwa.bwa_aln as bwa_aln_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz }
+            call bwa.bwa_aln as bwa_aln_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz, ncpu=n_threads }
         }
     }
     if (aligner == "bwa mem") {
         scatter (fastq in mapped_fastq.fastq){
-            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz }
+            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz, ncpu=n_threads }
         }
     }
     if (aligner == "star") {
         scatter (fastq in mapped_fastq.fastq){
-            call star.alignment as star_align { input: read_one_fastqs=[fastq], stardb_tar_gz=reference_tar_gz, output_prefix=basename(fastq, ".fq.gz") }
+            call star.alignment as star_align { input: read_one_fastqs=[fastq], stardb_tar_gz=reference_tar_gz, output_prefix=basename(fastq, ".fq.gz"), ncpu=n_threads }
         }
     }
     
@@ -87,11 +83,11 @@ workflow xenocp {
     }
 
     scatter (pair in zip(split_bams, sort.sorted_bam)){
-        call xenocp_tools.create_contam_list { input: input_bam=pair.left, contam_bam=pair.right }
+        call xenocp_tools.create_contam_list { input: input_bam=pair.left, contam_bam=pair.right, stringency=validation_stringency }
     }
 
     scatter (pair in zip(split_bams, create_contam_list.contam_list)){
-        call xenocp_tools.cleanse { input: input_bam=pair.left, unmap_reads=pair.right }
+        call xenocp_tools.cleanse { input: input_bam=pair.left, unmap_reads=pair.right, stringency=validation_stringency }
     }
 
     call xenocp_tools.merge_markdup_index { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=name }
