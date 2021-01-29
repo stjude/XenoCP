@@ -133,7 +133,7 @@ task extract_by_chrom {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs TweakSam to extract reads mapped to a chromosome." 
+        description: "This WDL tool runs TweakSam to extract reads with both mates mapped to a chromosome." 
     }
 
     parameter_meta {
@@ -322,7 +322,7 @@ task cleanse {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs creates a list of contamination reads by comparing host alignments to original alignments." 
+        description: "This WDL tool unmaps reads that have better mappings to the contaminant genome." 
     }
 
     parameter_meta {
@@ -376,7 +376,7 @@ task merge_markdup_index {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs creates a list of contamination reads by comparing host alignments to original alignments." 
+        description: "This WDL tool takes a set of BAM files and merges, marks duplicates (optional), and indexes the merged BAM." 
     }
 
     parameter_meta {
@@ -420,7 +420,7 @@ task qc {
     meta {
         author: "Andrew Thrasher"
         email: "andrew.thrasher@stjude.org"
-        description: "This WDL tool runs creates a list of contamination reads by comparing host alignments to original alignments." 
+        description: "This WDL tool QCs a BAM file by checking that it exists, is sorted, is indexed, and has a flagstat. Checks the flagstat for total reads, paired reads, read1 count matches read2 count, read1 count plus read2 count equals paired count, and that the mapping rate is > 75% and < 100%" 
     }
 
     parameter_meta {
