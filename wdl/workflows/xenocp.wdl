@@ -40,12 +40,14 @@ workflow xenocp {
         String aligner = "bwa aln"
         String validation_stringency = "SILENT"
         Int n_threads = 1
+        Boolean skip_duplicate_marking = false
     }
 
     parameter_meta {
         input_bam: "BAM file from which to clean contaminate reads"
         reference_tar_gz: "Reference gzipped tar file containing either STAR or BWA indexes depending on which aligner is selected. For BWA, files should be at the root level. For STAR, files should be in a directory that matches the root of the gzipped archive."
         aligner: "Which aligner to use to map reads to the host genome to detect contamination: [bwa aln, bwa mem, star]"
+        skip_duplicate_marking: "If true, duplicate marking will be skipped when the cleaned BAMs are merged"
     }
 
     String name = basename(input_bam, ".bam") + ".xenocp.bam"
@@ -90,7 +92,7 @@ workflow xenocp {
         call xenocp_tools.cleanse { input: input_bam=pair.left, unmap_reads=pair.right, stringency=validation_stringency }
     }
 
-    call xenocp_tools.merge_markdup_index { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=name }
+    call xenocp_tools.merge_markdup_index { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=name, skip_dup=skip_duplicate_marking }
 
     call xenocp_tools.qc { input: input_bam=merge_markdup_index.final_bam, input_bai=merge_markdup_index.final_bai, flagstat=merge_markdup_index.flagstat }
 
