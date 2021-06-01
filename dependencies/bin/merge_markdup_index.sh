@@ -11,6 +11,8 @@
 # $0 = (optional) --no-markdup to skip the mark dup step
 # $1 = output bam/sam
 # $2... = input bam/sam files
+#
+# The value of JAVA_HEAP_MEM is passed to java if set
 
 # Show usage information if no parameters were sent
 if [ "$#" == 0 ]; then about.sh $0; exit 1; fi
@@ -36,10 +38,12 @@ if [ "$OUT_DIR" != "" -a ! -e "$OUT_DIR" ]; then mkdir -p $OUT_DIR; fi
 # Get conventionally-named output locations
 bn=`basename $OUTPUT .bam`
 FLAGSTAT=$OUT_DIR/$bn.flagstat.txt
+STAT=$OUT_DIR/$bn.stat.txt
 MARKDUP_METRICS=$OUT_DIR/$bn.markdup.txt
 
 # Create scratch dir
 SCRATCH_DIR=`mktemp -d --tmpdir`
+export JAVA_TMPDIR=$SCRATCH_DIR
 
 # Get local output locations
 L_OUTPUT=$SCRATCH_DIR/$bn.bam
@@ -51,7 +55,7 @@ fi
 # Do the merge
 INPUT_ARGS=
 for INPUT in $INPUTS; do INPUT_ARGS="$INPUT_ARGS INPUT=$INPUT"; done
-cmd="java-settmp.sh $SCRATCH_DIR picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
+cmd="java.sh $JAVA_HEAP_MEM picard.cmdline.PicardCommandLine MergeSamFiles VALIDATION_STRINGENCY=LENIENT $INPUT_ARGS OUTPUT=$L_MERGED ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
 date
 echo $cmd
 if ! $cmd
@@ -63,7 +67,7 @@ if [ $NO_MARKDUP ]
 then
   echo "Skipping MarkDuplicates because $NO_MARKDUP was specified"
 else
-  cmd="java-settmp.sh $SCRATCH_DIR -Xmx8g picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
+  cmd="java.sh ${JAVA_HEAP_MEM:--Xmx8g} picard.cmdline.PicardCommandLine MarkDuplicates VALIDATION_STRINGENCY=SILENT INPUT=$L_MERGED OUTPUT=$L_OUTPUT METRICS_FILE=$MARKDUP_METRICS ASSUME_SORTED=true CREATE_INDEX=true CREATE_MD5_FILE=true"
   date
   echo $cmd
   if ! $cmd
@@ -88,4 +92,12 @@ date
 echo $cmd \> $FLAGSTAT
 if ! $cmd > $FLAGSTAT
 then echo "Warning: flagstat command failed" >&2
+fi
+
+# Do the stat
+cmd="samtools stats $L_OUTPUT"
+date
+echo $cmd \> $STAT
+if ! $cmd > $STAT
+then echo "Warning: stat command failed" >&2
 fi
