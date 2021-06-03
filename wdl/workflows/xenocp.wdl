@@ -27,7 +27,7 @@
 
 version 1.0
 
-import "https://raw.githubusercontent.com/stjude/xenocp/3.1.2/wdl/tools/xenocp.wdl" as xenocp_tools
+import "https://raw.githubusercontent.com/stjude/xenocp/3.1.3/wdl/tools/xenocp.wdl" as xenocp_tools
 import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/bwa.wdl"
 import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/star.wdl"
 import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/picard.wdl"
