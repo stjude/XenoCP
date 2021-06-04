@@ -14,6 +14,15 @@ jobs:
       -
         name: Sanitize Repo Name for Tagging
         run: echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]' | (read; echo REPO_LOWER=$REPLY) >> $GITHUB_ENV
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images:  ${{ env.REPO_LOWER }}
+          tags: |
+            type=ref,event=branch,prefix=branch-
+            type=ref,event=pr
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -30,5 +39,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: |
-            docker.io/${{ env.REPO_LOWER }}:branch-${GITHUB_REF##*/}
+          tags: ${{ steps.meta.outputs.tags }}
