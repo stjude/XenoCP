@@ -1,7 +1,8 @@
 name: Publish Docker image
 on:
-  release:
-    types: [published]
+  push:
+    branches-ignore:
+    - 'master'
 
 jobs:
   push_to_registry:
@@ -25,17 +26,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - 
-        name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GH_USERNAME }}
-          password: ${{ secrets.GH_TOKEN }}
-      - name: Build and Push
+      - name: Push to Docker Hub
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_LOWER }}:${{ github.event.release.tag_name }}
-            docker.io/${{ env.REPO_LOWER }}:${{ github.event.release.tag_name }}
+            docker.io/${{ env.REPO_LOWER }}:branch-${GITHUB_REF##*/}
