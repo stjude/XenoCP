@@ -3,7 +3,7 @@
   "title": "XenoCP (St. Jude)",
   "summary": "Xenograft sample cleaning pipeline",
   "dxapi": "1.0.0",
-  "version": "3.0.0",
+  "version": "3.1.4",
   "openSource": true,
   "developers": ["user-lding", "user-mrusch", "user-athrashe"],
   "authorizedUsers": [

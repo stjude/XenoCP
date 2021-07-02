@@ -35,7 +35,7 @@ task get_chroms {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -78,7 +78,7 @@ task extract_mismatch {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -122,7 +122,7 @@ task extract_by_chrom {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -175,7 +175,7 @@ task extract_unmapped {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -217,7 +217,7 @@ task mapped_fastq {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -262,7 +262,7 @@ task create_contam_list {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -311,7 +311,7 @@ task cleanse {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -361,7 +361,7 @@ task merge_markdup_index {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
@@ -409,7 +409,7 @@ task qc {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'stjude/xenocp:3.1.4'
         maxRetries: max_retries
     }
 
