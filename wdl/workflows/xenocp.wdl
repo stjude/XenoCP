@@ -71,7 +71,7 @@ workflow xenocp {
     }
     if (aligner == "bwa mem") {
         scatter (fastq in mapped_fastq.fastq){
-            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz, ncpu=n_threads }
+            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz, ncpu=n_threads, memory_gb=15 }
         }
     }
     if (aligner == "star") {
