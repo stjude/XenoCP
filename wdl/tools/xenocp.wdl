@@ -240,7 +240,7 @@ task mapped_fastq {
 task create_contam_list {
     input {
         File input_bam
-        String output_contam_list = basename(input_bam, ".bam") + "contam.txt"
+        String output_contam_list = basename(input_bam, ".bam") + ".contam.txt"
         String tie_bam = basename(input_bam, ".bam") + ".tie.bam"
         File contam_bam
         String stringency = "SILENT"
