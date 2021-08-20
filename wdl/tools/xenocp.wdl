@@ -59,7 +59,7 @@ task extract_mismatch {
     input {
         File input_bam
         File input_bai
-        Int memory_gb = 1
+        Int memory_gb = 8
         Int? disk_size_gb
         Int max_retries = 1
     }
@@ -103,7 +103,7 @@ task extract_by_chrom {
         File input_bam
         File input_bai
         String chromosome
-        Int memory_gb = 1
+        Int memory_gb = 8
         Int? disk_size_gb
         Int max_retries = 1
     }
@@ -246,7 +246,7 @@ task create_contam_list {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int memory_gb = 1
+        Int memory_gb = 8
     }
 
     Float input_bam_size = size(input_bam, "GiB")
@@ -295,7 +295,7 @@ task cleanse {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int memory_gb = 1
+        Int memory_gb = 8
     }
 
     Float input_bam_size = size(input_bam, "GiB")
