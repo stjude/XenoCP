@@ -46,7 +46,7 @@
       "name": "ref_name",
       "label": "Host Genome",
       "class": "string",
-      "choices": ["GRCm38", "MGSCv37", "Custom, specified as input"],
+      "choices": ["GRCm39", "GRCm38", "MGSCv37", "Custom, specified as input"],
       "optional": false,
       "default": "GRCm38",
       "help": ""
@@ -118,7 +118,10 @@
   ],
   "billTo": "org-stjude_cloud",
   "access": {
-    "allProjects": "VIEW"
+    "allProjects": "VIEW",
+    "network": [
+      "*"
+    ]
   },
   "runSpec": {
     "timeoutPolicy": {

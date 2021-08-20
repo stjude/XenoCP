@@ -70,7 +70,7 @@ main() {
         dx download -o $local_reference_dir -r project-F5444K89PZxXjBqVJ3Pp79B4:/global/reference/Mus_musculus/$ref_name/BWA
         mv $local_reference_dir/BWA/* $local_reference_dir/
       else
-        dx download -o $local_reference_dir -r project-FzJ7yx89Q0f0pBj5P2j1g0vB:/$ref_name/STAR
+        dx download -o $local_reference_dir -r project-F5444K89PZxXjBqVJ3Pp79B4:/global/reference/Mus_musculus/$ref_name/STAR
         reference_prefix="STAR"
       fi
     else
@@ -112,13 +112,6 @@ output_extension: $output_extension
 aligner: $aligner
 EOF
 
-    echo "  [*] Loading container image ..."
-    image_tarfile_path=/stjude/xenocp-docker.tar
-    if [ -e $image_tarfile_path.gz ]
-    then gunzip $image_tarfile_path.gz
-    fi
-    docker load -i $image_tarfile_path
-    
     echo "=== Execution ==="
     
     # Don't make assumptions about the tag that was used when the image was
@@ -133,8 +126,9 @@ EOF
       --mount type=bind,source=$local_data_dir,target=$container_data_dir,readonly \
       --mount type=bind,source=$local_reference_dir,target=$container_reference_dir,readonly \
       --mount type=bind,source=$local_output_dir,target=$container_output_dir \
-      $image_id \
+      ghcr.io/stjude/xenocp:3.1.4 \
       $container_data_dir/inputs.yml
+
 
     echo "=== Wrap Up ==="
     echo "  [*] Uploading outputs ..."
