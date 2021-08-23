@@ -194,7 +194,7 @@ steps:
         linkMerge: merge_flattened
       output_bam:
         source: bam
-        valueFrom: ${return self.nameroot + ".xenocp.bam"}
+        valueFrom: ${return self.nameroot + ".xenocp.tie.bam"}
       n_threads: n_threads
       skip_dup:
         valueFrom: $(true)
