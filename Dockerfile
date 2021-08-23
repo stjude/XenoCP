@@ -101,4 +101,4 @@ COPY --from=builder /opt/xenocp/bin/* /usr/local/bin/
 
 COPY cwl /opt/xenocp/cwl
 
-ENTRYPOINT ["cwl-runner", "--parallel", "--outdir", "results", "/opt/xenocp/cwl/xenocp.cwl"]
+ENTRYPOINT ["cwl-runner", "--parallel", "--outdir", "results", "--no-container", "/opt/xenocp/cwl/xenocp.cwl"]
