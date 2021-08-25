@@ -59,7 +59,7 @@ task extract_mismatch {
     input {
         File input_bam
         File input_bai
-        Int memory_gb = 8
+        Int memory_gb = 2
         Int? disk_size_gb
         Int max_retries = 1
     }
@@ -246,7 +246,7 @@ task create_contam_list {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int memory_gb = 8
+        Int memory_gb = 2
     }
 
     Float input_bam_size = size(input_bam, "GiB")
@@ -295,7 +295,7 @@ task cleanse {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int memory_gb = 8
+        Int memory_gb = 7
     }
 
     Float input_bam_size = size(input_bam, "GiB")
