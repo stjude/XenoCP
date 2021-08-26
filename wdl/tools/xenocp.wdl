@@ -35,7 +35,7 @@ task get_chroms {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -59,7 +59,7 @@ task extract_mismatch {
     input {
         File input_bam
         File input_bai
-        Int memory_gb = 1
+        Int memory_gb = 2
         Int? disk_size_gb
         Int max_retries = 1
     }
@@ -78,7 +78,7 @@ task extract_mismatch {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -103,7 +103,7 @@ task extract_by_chrom {
         File input_bam
         File input_bai
         String chromosome
-        Int memory_gb = 1
+        Int memory_gb = 8
         Int? disk_size_gb
         Int max_retries = 1
     }
@@ -122,7 +122,7 @@ task extract_by_chrom {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -175,7 +175,7 @@ task extract_unmapped {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -217,7 +217,7 @@ task mapped_fastq {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -246,7 +246,7 @@ task create_contam_list {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int memory_gb = 1
+        Int memory_gb = 2
     }
 
     Float input_bam_size = size(input_bam, "GiB")
@@ -262,7 +262,7 @@ task create_contam_list {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -295,7 +295,7 @@ task cleanse {
         String stringency = "SILENT"
         Int? disk_size_gb
         Int max_retries = 1
-        Int memory_gb = 1
+        Int memory_gb = 7
     }
 
     Float input_bam_size = size(input_bam, "GiB")
@@ -311,7 +311,7 @@ task cleanse {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -361,7 +361,7 @@ task merge_markdup_index {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: 1
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -409,7 +409,7 @@ task qc {
         memory: memory_gb + " GB"
         disk: disk_size + " GB"
         cpu: ncpu
-        docker: 'stjude/xenocp:3.1.0'
+        docker: 'ghcr.io/stjude/xenocp:latest'
         maxRetries: max_retries
     }
 
@@ -424,5 +424,46 @@ task qc {
 
     parameter_meta {
         input_bam: "Input BAM file"
+    }
+}
+
+task combine_files {
+    input {
+        Array[File] input_files
+        String output_file
+        Int? disk_size_gb
+        Int max_retries = 1
+        Int memory_gb = 1
+    }
+
+    Float input_file_size = size(input_files, "GiB")
+    Int disk_size = select_first([disk_size_gb, ceil(input_file_size * 2)])
+
+    command <<<
+        set -euo pipefail
+
+        cat ~{sep=" " input_files} > ~{output_file}
+    >>>
+
+    runtime {
+        memory: memory_gb + " GB"
+        disk: disk_size + " GB"
+        cpu: 1
+        docker: 'ghcr.io/stjude/xenocp:latest'
+        maxRetries: max_retries
+    }
+
+    output {
+        File final_file = output_file
+    }
+
+    meta {
+        author: "Andrew Thrasher"
+        email: "andrew.thrasher@stjude.org"
+        description: "This WDL tool takes a set of files and combines them with the cat utility." 
+    }
+
+    parameter_meta {
+        input_files: "Input files to combine with cat"
     }
 }

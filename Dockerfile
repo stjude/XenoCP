@@ -1,4 +1,6 @@
-FROM ubuntu:18.04 as builder
+FROM ubuntu:20.04 as builder
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
     && apt-get --yes install \
@@ -73,7 +75,7 @@ RUN cd /tmp/xenocp \
     && gradle installDist \
     && cp -r build/install/xenocp /opt
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN apt-get update \
     && apt-get --yes install --no-install-recommends \
@@ -82,6 +84,7 @@ RUN apt-get update \
         openjdk-11-jre-headless \
         python3 \
         python3-distutils \
+        python-is-python3 \
         file \
     && rm -rf /var/lib/apt/lists/*
 
@@ -98,4 +101,4 @@ COPY --from=builder /opt/xenocp/bin/* /usr/local/bin/
 
 COPY cwl /opt/xenocp/cwl
 
-ENTRYPOINT ["cwl-runner", "--parallel", "--outdir", "results", "/opt/xenocp/cwl/xenocp.cwl"]
+ENTRYPOINT ["cwl-runner", "--parallel", "--outdir", "results", "--no-container", "/opt/xenocp/cwl/xenocp.cwl"]
