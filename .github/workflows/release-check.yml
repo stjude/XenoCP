@@ -1,0 +1,31 @@
+name: release-check
+
+on:
+  push:
+    branches:
+      - release
+  pull_request:
+    branches:
+      - release
+
+jobs:
+  docker_pull_check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Ensure SemVer'd docker images are being pulled
+      run: |
+        EXITCODE=0
+        files=$(find . -name '*.wdl')
+        for file in $files; do
+          while IFS= read -r line; do
+            tag=$(echo "$line" | awk -F ':' '{print substr($3, 1, length($3)-1)}')
+            if ! [[ $tag =~ ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$ ]]; then
+              >&2 echo "All Docker containers must be using an official SemVer tagged image"
+              >&2 echo "Offending line: $line"
+              >&2 echo "In file: $file"
+              EXITCODE=1
+            fi
+          done < <(awk '/docker: .*stjudecloud/ || /docker: .*stjude/' < "$file")
+        done
+        exit $EXITCODE
