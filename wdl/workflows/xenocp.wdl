@@ -28,9 +28,9 @@
 version 1.0
 
 import "https://raw.githubusercontent.com/stjude/xenocp/main/wdl/tools/xenocp.wdl" as xenocp_tools
-import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/bwa.wdl"
-import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/star.wdl"
-import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/picard.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/main/tools/bwa.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/main/tools/star.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/main/tools/picard.wdl"
 
 workflow xenocp {
     input {

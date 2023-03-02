@@ -22,7 +22,7 @@ jobs:
         files=$(find . -name '*.wdl')
         for file in $files; do
           sed -i 's,https://raw.githubusercontent.com/stjude/xenocp/'"$(echo ${GITHUB_REF#refs/heads/})"','"$(pwd)"',g' "$file"
-          sed -i 's,https://raw.githubusercontent.com/stjude/xenocp/master,'"$(pwd)"',g' "$file"
+          sed -i 's,https://raw.githubusercontent.com/stjude/xenocp/main,'"$(pwd)"',g' "$file"
         done
         for file in $files; do
           echo "  [***] $file [***]"
