@@ -3,29 +3,40 @@ name: lint-check
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   import_syntax_check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Check import syntax
       run: |
         EXITCODE=0
         for file in $(find . -name '*.wdl'); do
           >&2 echo "Checking file $file..."
           import_lines=$(awk '/import/' "$file")
-          bad_lines=$(echo "$import_lines" | awk '!/https:\/\/raw.githubusercontent.com\/stjude\/xenocp\/master/ && !/https:\/\/raw.githubusercontent.com\/stjudecloud\/workflows\/master/' | grep -v '# lint-check: ignore') || true
+
+          bad_lines=$(echo "$import_lines" | awk '/https:\/\/raw.githubusercontent.com\/stjude\/XenoCP/') || true
           if [ -n "$bad_lines" ]; then
-            >&2 echo "Must import files from the master branch on Github."
+            >&2 echo "Imports from this repo must use relative paths!"
             >&2 echo "The following lines are bad:"
             >&2 echo "$bad_lines"
             >&2 echo ""
             EXITCODE=1
           fi
+
+          bad_lines=$(echo "$import_lines" | awk '/http/ && (/main/ || /master/)') || true
+          if [ -n "$bad_lines" ]; then
+            >&2 echo "Imports from external repos must use a tagged release!"
+            >&2 echo "The following lines are bad:"
+            >&2 echo "$bad_lines"
+            >&2 echo ""
+            EXITCODE=1
+          fi
+
         done
         exit $EXITCODE
