@@ -97,8 +97,8 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     loadable_ids = raptr.fetch_col_or_fail(query, (bam_tpl_id,))
 
     # Insert a new bam_tpl with qualifier 'xenocp'
-    query = """insert into bam_tpl (bam_tpl_id, qualifier, status, sample_target_project_id)
-            values (nextval('blt_id_seq'), 'xenocp', 'Default', %s) returning bam_tpl_id;"""
+    query = """insert into bam_tpl (qualifier, status, sample_target_project_id)
+            values ('xenocp', 'Default', %s) returning bam_tpl_id;"""
     bam_tpl_id_xenocp = raptr.fetch_item_or_fail(query, (stp_id,))
 
     # Associate loadables with new bam_tpl.
@@ -110,8 +110,8 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     query = """select genome_id from bam where bam_id = %s;"""
     genome_id = raptr.fetch_item_or_fail(query, (bam_id,))
     # Add a new bam
-    query = """insert into bam (bam_id, bam_tpl_id, status, notes, genome_id)
-            values (nextval('blt_id_seq'), %s, 'Normal', NULL, %s) returning bam_id;"""
+    query = """insert into bam (bam_tpl_id, status, notes, genome_id)
+            values (%s, 'Normal', NULL, %s) returning bam_id;"""
     bam_id_xenocp = raptr.fetch_item_or_fail(query, (bam_tpl_id_xenocp, genome_id))
     # Update primary_bam_id of bam_tpl with the qualifier
     query = """update bam_tpl set primary_bam_id = %s where bam_tpl_id = %s;"""
@@ -134,8 +134,8 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     control_bam_ids = raptr.fetch_col_or_silent(query, (bam_id,))
     if control_bam_ids:
         # Insert bam_pairs to pair newly created bam_id with control bam_ids with qualifier 'xenocp'
-        query = """insert into bam_pair (bam_pair_id, case_bam_id, control_bam_id, qualifier, status, notes)
-                values (nextval('blt_id_seq'), %s, %s, 'xenocp', 'Normal', NULL);"""
+        query = """insert into bam_pair (case_bam_id, control_bam_id, qualifier, status, notes)
+                values (%s, %s, 'xenocp', 'Normal', NULL);"""
         for control_bam_id in control_bam_ids:
             raptr.execute(query, (bam_id_xenocp, control_bam_id))
 
