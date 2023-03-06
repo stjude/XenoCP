@@ -12,7 +12,7 @@ jobs:
   docker_pull_check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Ensure SemVer'd docker images are being pulled
       run: |
         EXITCODE=0
