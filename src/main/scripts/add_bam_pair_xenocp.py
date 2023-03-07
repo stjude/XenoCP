@@ -118,11 +118,19 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     raptr.execute(query, (bam_id_xenocp, bam_tpl_id_xenocp))
 
     # Get read_group_ids and insert into bam_read_group
-    query = """select rg.read_group_id, rg.pu
-            from read_group rg inner join sample_target_project_view stpv
-            on rg.sample_target_id = stpv.sample_target_id and rg.project_id = stpv.project_id
-            where status = 'Normal' and formal_name = %s and target_name = %s
-            and project_name = %s and subproject = %s;"""
+    query = """select
+            rg.read_group_id,
+            rg.pu
+        from
+            read_group rg
+            inner join sample_target_project_view stpv
+                on rg.sample_target_id = stpv.sample_target_id and rg.project_id = stpv.project_id
+        where
+            status = 'Normal'
+            and formal_name = %s
+            and target_name = %s
+            and project_name = %s
+            and subproject = %s;"""
     res = raptr.execute_fetch(query, (sample, target, project, subproject))
     query = """insert into bam_read_group (bam_id, read_group_id, rgid)
             values (%s, %s, %s);"""
