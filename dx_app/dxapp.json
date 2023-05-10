@@ -3,7 +3,7 @@
   "title": "XenoCP (St. Jude)",
   "summary": "Xenograft sample cleaning pipeline",
   "dxapi": "1.0.0",
-  "version": "3.1.4",
+  "version": "4.0.0-alpha",
   "openSource": true,
   "developers": ["user-lding", "user-mrusch", "user-athrashe"],
   "authorizedUsers": [
@@ -46,7 +46,7 @@
       "name": "ref_name",
       "label": "Host Genome",
       "class": "string",
-      "choices": ["GRCm38", "MGSCv37", "Custom, specified as input"],
+      "choices": ["GRCm39", "GRCm38", "MGSCv37", "Custom, specified as input"],
       "optional": false,
       "default": "GRCm38",
       "help": ""
@@ -118,7 +118,10 @@
   ],
   "billTo": "org-stjude_cloud",
   "access": {
-    "allProjects": "VIEW"
+    "allProjects": "VIEW",
+    "network": [
+      "*"
+    ]
   },
   "runSpec": {
     "timeoutPolicy": {

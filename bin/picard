@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+java -jar /opt/picard/lib/picard*.jar "$@"

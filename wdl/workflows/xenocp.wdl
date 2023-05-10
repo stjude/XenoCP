@@ -27,10 +27,10 @@
 
 version 1.0
 
-import "https://raw.githubusercontent.com/stjude/xenocp/3.1.4/wdl/tools/xenocp.wdl" as xenocp_tools
-import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/bwa.wdl"
-import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/star.wdl"
-import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/picard.wdl"
+import "../tools/xenocp.wdl" as xenocp_tools
+import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v4.0.0-alpha/tools/bwa.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v4.0.0-alpha/tools/star.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v4.0.0-alpha/tools/picard.wdl"
 
 workflow xenocp {
     input {
@@ -49,8 +49,9 @@ workflow xenocp {
         aligner: "Which aligner to use to map reads to the host genome to detect contamination: [bwa aln, bwa mem, star]"
         skip_duplicate_marking: "If true, duplicate marking will be skipped when the cleaned BAMs are merged"
     }
-
-    String name = basename(input_bam, ".bam") + ".xenocp.bam"
+    
+    String name = basename(input_bam, ".bam")
+    String output_name = name + ".xenocp.bam"
 
     call xenocp_tools.get_chroms { input: input_bam=input_bam, ncpu=n_threads }
     call xenocp_tools.extract_mismatch as mismatch { input: input_bam=input_bam, input_bai=input_bai }
@@ -71,7 +72,7 @@ workflow xenocp {
     }
     if (aligner == "bwa mem") {
         scatter (fastq in mapped_fastq.fastq){
-            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz, ncpu=n_threads }
+            call bwa.bwa_mem as bwa_mem_align { input: fastq=fastq, bwadb_tar_gz=reference_tar_gz, ncpu=n_threads, memory_gb=15 }
         }
     }
     if (aligner == "star") {
@@ -92,16 +93,24 @@ workflow xenocp {
         call xenocp_tools.cleanse { input: input_bam=pair.left, unmap_reads=pair.right, stringency=validation_stringency }
     }
 
-    call xenocp_tools.merge_markdup_index { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=name, skip_dup=skip_duplicate_marking }
+    call xenocp_tools.merge_markdup_index as final_bam { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=output_name, skip_dup=skip_duplicate_marking }
 
-    call xenocp_tools.qc { input: input_bam=merge_markdup_index.final_bam, input_bai=merge_markdup_index.final_bai, flagstat=merge_markdup_index.flagstat }
+    call xenocp_tools.qc { input: input_bam=final_bam.final_bam, input_bai=final_bam.final_bai, flagstat=final_bam.flagstat }
+
+    scatter(bam in create_contam_list.output_tie_bam){
+        call picard.sort as tie_sort { input: bam=bam, sort_order="coordinate" }
+    }
+
+    call xenocp_tools.merge_markdup_index as combine_tie_bam { input: input_bams=tie_sort.sorted_bam, output_bam=name+".tie.bam", skip_dup=true }
+
+    call xenocp_tools.combine_files { input: input_files=create_contam_list.contam_list, output_file=name+".contam.txt" }
 
     output {
-        File bam = merge_markdup_index.final_bam
-        File bam_index = merge_markdup_index.final_bai
-        File bam_md5 = merge_markdup_index.final_md5
-        File flagstat = merge_markdup_index.flagstat
-        Array[File] contam_list = create_contam_list.contam_list
-        Array[File] tie_bam = create_contam_list.output_tie_bam
+        File bam = final_bam.final_bam
+        File bam_index = final_bam.final_bai
+        File bam_md5 = final_bam.final_md5
+        File flagstat = final_bam.flagstat
+        File contam_list = combine_files.final_file
+        File tie_bam = combine_tie_bam.final_bam
     }
 }

@@ -12,6 +12,11 @@ hints:
       tweak_sam:
         specs: ["java.sh org.stjude.compbio.sam.TweakSam"]
 
+requirements:
+  ResourceRequirement:
+    ramMin: 15000
+    coresMin: 1
+
 inputs:
   ref_db_prefix: 
     type: string
