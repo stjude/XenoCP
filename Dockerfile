@@ -15,21 +15,22 @@ RUN apt-get update \
 
 RUN pip3 install --user --ignore-installed \
         cwlref-runner \
-        html5lib
+        html5lib \
+        urllib3==1.26.15
 
 RUN cd /tmp \
-    && wget https://github.com/lh3/bwa/releases/download/v0.7.13/bwa-0.7.13.tar.bz2 \
-    && echo "559b3c63266e5d5351f7665268263dbb9592f3c1c4569e7a4a75a15f17f0aedc *bwa-0.7.13.tar.bz2" | sha256sum --check \
-    && tar xf bwa-0.7.13.tar.bz2 \
-    && cd bwa-0.7.13 \
+    && wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2 \
+    && echo "de1b4d4e745c0b7fc3e107b5155a51ac063011d33a5d82696331ecf4bed8d0fd *bwa-0.7.17.tar.bz2" | sha256sum --check \
+    && tar xf bwa-0.7.17.tar.bz2 \
+    && cd bwa-0.7.17 \
     && make -j$(nproc) \
     && mv bwa /usr/local/bin
 
 RUN cd /tmp \
-    && wget https://github.com/alexdobin/STAR/archive/2.7.1a.tar.gz \
-    && echo "9a35bf4e8a12bec505e11132bc53f94671f596584a6a0dd8f237120dd0df740e *2.7.1a.tar.gz" | sha256sum --check \
-    && tar xf 2.7.1a.tar.gz \
-    && mv STAR-2.7.1a/bin/Linux_x86_64_static/STAR /usr/local/bin
+    && wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a.tar.gz \
+    && echo "af0df8fdc0e7a539b3ec6665dce9ac55c33598dfbc74d24df9dae7a309b0426a *2.7.10a.tar.gz" | sha256sum --check \
+    && tar xf 2.7.10a.tar.gz \
+    && mv STAR-2.7.10a/bin/Linux_x86_64_static/STAR /usr/local/bin
 
 # bz2 and lzma support is for CRAM files. curses is for `samtools tview`.
 RUN cd /tmp \
