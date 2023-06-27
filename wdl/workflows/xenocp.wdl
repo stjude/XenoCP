@@ -27,10 +27,10 @@
 
 version 1.0
 
-import "https://raw.githubusercontent.com/stjude/xenocp/master/wdl/tools/xenocp.wdl" as xenocp_tools
-import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/bwa.wdl"
-import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/star.wdl"
-import "https://raw.githubusercontent.com/stjudecloud/workflows/master/tools/picard.wdl"
+import "https://raw.githubusercontent.com/stjude/xenocp/3.1.1/wdl/tools/xenocp.wdl" as xenocp_tools
+import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/bwa.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/star.wdl"
+import "https://raw.githubusercontent.com/stjudecloud/workflows/rnaseq-standard/v3.0.0/tools/picard.wdl"
 
 workflow xenocp {
     input {
