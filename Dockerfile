@@ -13,7 +13,8 @@ RUN apt-get update \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --user --ignore-installed \
+RUN pip3 install --ignore-installed \
+        --prefix /usr/local \
         cwlref-runner \
         html5lib
 
@@ -88,17 +89,16 @@ RUN apt-get update \
         file \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PATH /root/.local/bin:$PATH
+COPY --chmod=755 --from=builder /usr/local/bin/cwl* /usr/local/bin/
+COPY --chmod=755 --from=builder /usr/local/lib /usr/local/lib/
+COPY --chmod=755 --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
+COPY --chmod=755 --from=builder /usr/local/bin/STAR /usr/local/bin/STAR
+COPY --chmod=755 --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
+COPY --chmod=755 --from=builder /usr/local/bin/sambamba /usr/local/bin/sambamba
+COPY --chmod=755 --from=builder /opt/picard /opt/picard
+COPY --chmod=755 --from=builder /opt/xenocp /opt/xenocp
+COPY --chmod=755 --from=builder /opt/xenocp/bin/* /usr/local/bin/
 
-COPY --from=builder /root/.local /root/.local
-COPY --from=builder /usr/local/bin/bwa /usr/local/bin/bwa
-COPY --from=builder /usr/local/bin/STAR /usr/local/bin/STAR
-COPY --from=builder /usr/local/bin/samtools /usr/local/bin/samtools
-COPY --from=builder /usr/local/bin/sambamba /usr/local/bin/sambamba
-COPY --from=builder /opt/picard /opt/picard
-COPY --from=builder /opt/xenocp /opt/xenocp
-COPY --from=builder /opt/xenocp/bin/* /usr/local/bin/
-
-COPY cwl /opt/xenocp/cwl
+COPY --chmod=755  cwl /opt/xenocp/cwl
 
 ENTRYPOINT ["cwl-runner", "--parallel", "--outdir", "results", "--no-container", "/opt/xenocp/cwl/xenocp.cwl"]
