@@ -46,7 +46,7 @@ inputs:
 outputs:
   output_bam:
     type: File
-    outputSource: finish/final_bam
+    outputSource: clean_bam_header/final_bam
   flagstat:
     type: File
     outputSource: finish/flagstat
@@ -181,7 +181,7 @@ steps:
         linkMerge: merge_flattened
       output_bam:
         source: bam
-        valueFrom: ${return self.nameroot + ".xenocp.bam"}
+        valueFrom: ${return self.nameroot + ".tmp.bam"}
       n_threads: n_threads
     out: [final_bam, flagstat]
 
@@ -210,11 +210,27 @@ steps:
         valueFrom: ${return self.nameroot + ".contam.txt"}
     out: [combined_file]
 
-  # Step08: QC the merged bam
+  # Step08: Clean BAM header
+  clean_bam_header:
+    run: finalize_bam.cwl
+    in:
+      input_bam:
+        source: finish/final_bam
+      output_bam:
+        source: bam
+        valueFrom: ${return self.nameroot + ".xenocp.bam"}
+      ref_db_prefix: ref_db_prefix
+      aligner: aligner
+      original_bam_name:
+        source: bam
+        valueFrom: ${return self.basename}
+    out: [final_bam]
+
+  # Step09: QC the merged bam
   finalqc:
     run: qc_bam.cwl
     in:
-      bam: finish/final_bam
+      bam: clean_bam_header/final_bam
       flagstat: finish/flagstat
     out: []
 

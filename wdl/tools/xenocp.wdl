@@ -467,3 +467,53 @@ task combine_files {
         input_files: "Input files to combine with cat"
     }
 }
+
+task finalize_bam {
+    input {
+        File input_bam
+        String output_file
+        String reference_tar_gz
+        String aligner
+        String original_bam_name
+        Int? disk_size_gb
+        Int max_retries = 1
+        Int memory_gb = 1
+    }
+
+    Float input_file_size = size(input_bam, "GiB")
+    Int disk_size = select_first([disk_size_gb, ceil(input_file_size * 2)])
+
+    command <<<
+        set -euo pipefail
+
+        bash finalize_bam.sh ~{input_bam} ~{output_file} ~{reference_tar_gz} ~{aligner} ~{original_bam_name}
+    >>>
+
+    runtime {
+        memory: memory_gb + " GB"
+        disk: disk_size + " GB"
+        cpu: 1
+        docker: 'adthrasher/xenocp:dev'
+        maxRetries: max_retries
+    }
+
+    output {
+        File final_bam = output_file
+        File final_md5 = output_file + ".md5"
+        File final_bai = output_file + ".bai"
+    }
+
+    meta {
+        author: "Andrew Thrasher"
+        email: "andrew.thrasher@stjude.org"
+        description: "This WDL tool clean sthe BAM header and adds a XenoCP @PG record"
+    }
+
+    parameter_meta {
+        input_bam: "BAM file with header to edit"
+        output_file: "Name for output BAM with edited header"
+        reference_tar_gz: "File name for contaminant reference database"
+        aligner: "Name of aligner used to align to contaminant database"
+        original_bam_name: "Name of the BAM used as input to XenoCP"
+    }
+}
