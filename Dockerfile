@@ -102,5 +102,3 @@ COPY --chmod=755 --from=builder /opt/xenocp /opt/xenocp
 COPY --chmod=755 --from=builder /opt/xenocp/bin/* /usr/local/bin/
 
 COPY --chmod=755  cwl /opt/xenocp/cwl
-
-ENTRYPOINT ["cwl-runner", "--parallel", "--outdir", "results", "--no-container", "/opt/xenocp/cwl/xenocp.cwl"]

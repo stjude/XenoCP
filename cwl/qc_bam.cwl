@@ -10,6 +10,8 @@ hints:
     packages:
       qclib:
         specs: ["qclib.sh"]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 inputs:
   bam:

@@ -37,6 +37,9 @@ steps:
     out: [out_bam]
     run: 
       class: CommandLineTool
+      hints:
+        DockerRequirement:
+          dockerPull: "ghcr.io/stjude/xenocp:latest"
       stdout: other.bam
       inputs: 
         bam: 
@@ -62,6 +65,9 @@ steps:
     scatter: chroms
     run:
       class: CommandLineTool
+      hints:
+        DockerRequirement:
+          dockerPull: "ghcr.io/stjude/xenocp:latest"
       inputs:
         chroms:
           type: string
@@ -88,6 +94,9 @@ steps:
    out: [unmapped_bam]
    run: 
      class: CommandLineTool
+     hints:
+        DockerRequirement:
+          dockerPull: "ghcr.io/stjude/xenocp:latest"
      stdout: unmapped.bam
      inputs: 
        bam: 

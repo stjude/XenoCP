@@ -1,5 +1,8 @@
 bam:
   class: File
   path: SJRB001_X.subset.bam
-ref_db_prefix: /path/to/reference
+ref_db_prefix: MGSCv37.fa
+index:
+  class: Directory
+  path: ../../reference/MGSCv37
 aligner: "bwa aln"

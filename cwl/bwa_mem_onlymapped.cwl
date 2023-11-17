@@ -11,6 +11,8 @@ hints:
         specs: ["bwa mem"]
       tweak_sam:
         specs: ["java.sh org.stjude.compbio.sam.TweakSam"]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 requirements:
   ResourceRequirement:
@@ -22,6 +24,10 @@ inputs:
     type: string
     inputBinding:
         position: 1
+        valueFrom: |
+          ${
+            return inputs.index.path + "/" + self;
+          }
   input_fastq:
     type: File
     inputBinding:
@@ -31,6 +37,8 @@ inputs:
     label: Must be an output bam file name, not an absolute path
     inputBinding:
         position: 3
+  index:
+    type: Directory
 
 outputs:
     bam:

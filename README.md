@@ -197,8 +197,8 @@ $ docker build --tag xenocp .
 
 The Docker image uses `cwl-runner cwl/xenocp.cwl` as its entrypoint.
 
-The image assumes three working directories: `/data` for inputs, `/references` for
-reference files, and `/results` for outputs. `/data` and `/references` can be
+The image assumes three working directories: `/data` for inputs, `/reference` for
+reference files, and `/results` for outputs. `/data` and `/reference` can be
 read-only, where as `/results` needs write access.
 
 The paths given in the input parameters file must be from inside the
@@ -208,7 +208,10 @@ container, not the host, e.g.,
 bam:
   class: File
   path: /data/sample.bam
-ref_db_prefix: /reference/ref.fa
+ref_db_prefix: ref.fa
+index:
+  class: Directory
+  path: /reference
 aligner: "bwa aln"
 ```
 
@@ -224,6 +227,11 @@ $ docker run \
   --mount type=bind,source=/path/to/reference,target=/reference,readonly \
   --mount type=bind,source=$(pwd)/results,target=/results \
   xenocp \
+  cwl-runner \
+  --parallel \
+  --outdir results \
+  --no-container \
+  /opt/xenocp/cwl/xenocp.cwl \
   /data/inputs.yml
 ```
 

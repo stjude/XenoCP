@@ -6,7 +6,11 @@ doc: |
   Merge a set of files into file using the cat utility.
 
 requirements:
- - class: InlineJavascriptRequirement
+  InlineJavascriptRequirement: {}
+
+hints:
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 baseCommand: cat
 

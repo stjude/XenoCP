@@ -10,6 +10,10 @@ doc: |
 requirements:
  - class: InlineJavascriptRequirement
 
+hints:
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
+
 baseCommand: merge_markdup_index.sh
 
 inputs:
