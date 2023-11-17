@@ -5,7 +5,7 @@ XenoCP can be easily incorporated into any workflow, as it takes a BAM file
 as input and efficiently cleans up the mouse contamination. The output is a clean
 human BAM file that could be used for downstream genomic analysis. 
 
-## Getting started
+## Quick Start
 
 XenoCP can be run in the cloud on DNAnexus at
 https://platform.dnanexus.com/app/stjude_xenocp
@@ -39,7 +39,38 @@ XenoCP workflow:
 <!--![Alt text](images/xenocp_workflow2.png) -->
 <img src="images/xenocp_workflow2.png" width="500">
 
-## Prerequisites
+## Reference Files
+
+XenoCP performs mapping against the host genome, so it requires indexes for the
+host reference genome and mapper being used.
+
+A common use case is cleansing DNA reads with a mouse host. For this use case,
+you can download the a BWA index for MGSCv37 from
+http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37
+
+To build your own reference files, first download the FASTA file for your genome
+assembly. Then, create the index for your mapper:
+
+### BWA for DNA Reads
+
+```
+$ bwa index -p $FASTA $FASTA
+```
+
+### STAR for RNA Reads
+
+Download an annotation file such as gencode, and then run:
+
+```
+$ STAR --runMode genomeGenerate --genomeDir STAR --genomeFastaFiles $FASTA --sjdbGTFfile $ANNOTATION --sjdbOverhang 125
+```
+
+## Local Usage without Docker
+
+### Prerequisites
+
+First, install the following prerequisites. Note that if you are only using one
+of the two mappers, bwa and STAR, you can omit the other.
 
   * [bwa] =0.7.13
   * [STAR] =2.7.1a
@@ -73,28 +104,25 @@ disabled.
 [zlib]: https://www.zlib.net/
 [sambamba]: http://lomereiter.github.io/sambamba/
 
+### Obtain and Build XenoCP
 
-
-## Local usage
-
-
-### Obtain XenoCP 
-
-Clone XenoCP from GitHub: 
+Clone XenoCP from GitHub:
 ```
 git clone https://github.com/stjude/XenoCP.git
 ```
 
-### Build XenoCP
-
-Once the prerequisites are satisfied, build XenoCP using Gradle. 
+Build XenoCP using Gradle:
 
 ```
 $ gradle installDist
 ```
 
-Add the artifacts under `build/install/xenocp/lib` to your Java `CLASSPATH`.
-Add the artifacts under `build/install/xenocp/bin` to your `PATH`.
+Add the artifacts under `build/install/xenocp` to your `PATH` and your Java `CLASSPATH`:
+
+```
+export PATH=$PATH:`pwd`/build/install/xenocp/bin
+export CLASSPATH=$CLASSPATH:`pwd`/build/install/xenocp/lib/*
+```
 
 ### Inputs
 
@@ -134,24 +162,7 @@ output_prefix: xenocp-
 output_extension: bam
 ```
 
-### Create Reference Files
-
-Download the FASTA file for your genome assembly and run the following commands to create other files:
-#### BWA reference files
-```
-$ bwa index -p $FASTA $FASTA
-```
-#### STAR reference files
-In addition the genomic FASTA, STAR reference should use an annotation file (e.g. gencode).
-```
-$ STAR --runMode genomeGenerate --genomeDir STAR --genomeFastaFiles $FASTA --sjdbGTFfile $ANNOTATION --sjdbOverhang 125
-```
-
 [CWL inputs]: https://www.commonwl.org/user_guide/02-1st-example/index.html
-
-### Download MGSCv37 reference files
-
-Reference files are provided for version MGSCv37 of mouse and are available from http://ftp.stjude.org/pub/software/xenocp/reference/MGSCv37
 
 ### Run
 
@@ -162,12 +173,12 @@ Then run the following.
 
 ```
 $ mkdir results
-$ cwltool --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
+$ cwltool --preserve-environment CLASSPATH --no-container --outdir results cwl/xenocp.cwl sample_data/input_data/inputs_local.yml
 ```
 
 [CWL]: https://www.commonwl.org/
 
-## Docker
+## Local Usage with Docker
 
 XenoCP provides a [Dockerfile] that builds an image with all the included
 dependencies. To use this image, install [Docker] for your platform.
@@ -215,6 +226,11 @@ $ docker run \
   xenocp \
   /data/inputs.yml
 ```
+
+Note: when running using Singularity on an HPC, problems can arise if the
+default temporary file location, /tmp, is small. To solve this, include
+`-W <dir>` when executing via Singularity to redirect temp files to a
+larger directory `<dir>`.
 
 [Dockerfile]: ./Dockerfile
 

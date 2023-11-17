@@ -1,2 +1,8 @@
 #!/usr/bin/env bash
+
+# If the classpath is already set, then invoke PicardCommandLine, allowing
+# java to use the classpath.
+if [ "$CLASSPATH" != "" ]; then exec java picard.cmdline.PicardCommandLine "$@"; fi
+
+# Otherwise, use the full picard jar; this assumes you're running in the container.
 java -jar /opt/picard/lib/picard*.jar "$@"

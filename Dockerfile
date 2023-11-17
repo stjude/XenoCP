@@ -69,11 +69,13 @@ ENV PATH /opt/gradle/bin:${PATH}
 COPY bin /tmp/xenocp/bin
 COPY src /tmp/xenocp/src
 COPY dependencies /tmp/xenocp/dependencies
+COPY gradle /tmp/xenocp/gradle
+COPY gradlew /tmp/xenocp/gradlew
 COPY build.gradle /tmp/xenocp/build.gradle
 COPY settings.gradle /tmp/xenocp/settings.gradle
 
 RUN cd /tmp/xenocp \
-    && gradle installDist \
+    && ./gradlew installDist \
     && cp -r build/install/xenocp /opt
 
 FROM ubuntu:20.04
