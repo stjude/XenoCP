@@ -4,5 +4,5 @@ bam:
 ref_db_prefix: MGSCv37.fa
 index:
   class: Directory
-  path: ../../reference/MGSCv37
+  path: /path/to/reference
 aligner: "bwa aln"

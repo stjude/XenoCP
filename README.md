@@ -1,5 +1,26 @@
 # XenoCP
 
+- [XenoCP](#xenocp)
+  - [Quick Start](#quick-start)
+  - [Introduction to XenoCP](#introduction-to-xenocp)
+  - [Reference Files](#reference-files)
+    - [BWA for DNA Reads](#bwa-for-dna-reads)
+    - [STAR for RNA Reads](#star-for-rna-reads)
+  - [Local Usage without Docker](#local-usage-without-docker)
+    - [Prerequisites](#prerequisites)
+    - [Obtain and Build XenoCP](#obtain-and-build-xenocp)
+    - [Inputs](#inputs)
+    - [Run](#run)
+  - [Local Usage with Docker](#local-usage-with-docker)
+    - [Build Docker image](#build-docker-image)
+    - [Run](#run-1)
+  - [Evaluate test data results](#evaluate-test-data-results)
+  - [St. Jude Cloud](#st-jude-cloud)
+  - [Availability](#availability)
+  - [Seeking help](#seeking-help)
+  - [Citing XenoCP](#citing-xenocp)
+  - [Common Issues](#common-issues)
+
 XenoCP is a tool for cleansing mouse reads in xenograft BAMs.
 XenoCP can be easily incorporated into any workflow, as it takes a BAM file
 as input and efficiently cleans up the mouse contamination. The output is a clean

@@ -27,10 +27,10 @@ RUN cd /tmp \
     && mv bwa /usr/local/bin
 
 RUN cd /tmp \
-    && wget https://github.com/alexdobin/STAR/archive/2.7.1a.tar.gz \
-    && echo "9a35bf4e8a12bec505e11132bc53f94671f596584a6a0dd8f237120dd0df740e *2.7.1a.tar.gz" | sha256sum --check \
-    && tar xf 2.7.1a.tar.gz \
-    && mv STAR-2.7.1a/bin/Linux_x86_64_static/STAR /usr/local/bin
+    && wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a.tar.gz \
+    && echo "af0df8fdc0e7a539b3ec6665dce9ac55c33598dfbc74d24df9dae7a309b0426a *2.7.10a.tar.gz" | sha256sum --check \
+    && tar xf 2.7.10a.tar.gz \
+    && mv STAR-2.7.10a/bin/Linux_x86_64_static/STAR /usr/local/bin
 
 # bz2 and lzma support is for CRAM files. curses is for `samtools tview`.
 RUN cd /tmp \

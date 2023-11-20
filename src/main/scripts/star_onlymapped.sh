@@ -31,19 +31,19 @@ name=$(basename $BAM ".bam")
 
 # Ensure reads are not compressed
 reads=$(readlink -f ${FASTQ})
+read_cmd=""
 if file ${reads} | grep -c "gzip compressed data"
 then
-    gzip -dc ${reads} > reads.fq
-    reads="reads.fq"
+    read_cmd="--readFilesCommand zcat"
 elif file ${reads} | grep -c "bzip2 compressed data"
 then
-    bzip2 -dc ${reads} > reads.fq
-    reads="reads.fq"
+    read_cmd="--readFilesCommand bzcat"
 fi
 
 # STAR
 n_cores=$(nproc)
 cmd="STAR --genomeDir ${GENOMEDIR} \
+            ${read_cmd} \
              --readFilesIn ${reads} \
              --runMode alignReads \
              --runThreadN ${n_cores} \
