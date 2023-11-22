@@ -19,10 +19,10 @@ RUN pip3 install --ignore-installed \
         html5lib
 
 RUN cd /tmp \
-    && wget https://github.com/lh3/bwa/releases/download/v0.7.13/bwa-0.7.13.tar.bz2 \
-    && echo "559b3c63266e5d5351f7665268263dbb9592f3c1c4569e7a4a75a15f17f0aedc *bwa-0.7.13.tar.bz2" | sha256sum --check \
-    && tar xf bwa-0.7.13.tar.bz2 \
-    && cd bwa-0.7.13 \
+    && wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2 \
+    && echo "de1b4d4e745c0b7fc3e107b5155a51ac063011d33a5d82696331ecf4bed8d0fd *bwa-0.7.17.tar.bz2" | sha256sum --check \
+    && tar xf bwa-0.7.17.tar.bz2 \
+    && cd bwa-0.7.17 \
     && make -j$(nproc) \
     && mv bwa /usr/local/bin
 
