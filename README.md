@@ -1,5 +1,30 @@
 # XenoCP
 
+- [XenoCP](#xenocp)
+  - [Quick Start](#quick-start)
+  - [Introduction to XenoCP](#introduction-to-xenocp)
+  - [Reference Files](#reference-files)
+    - [BWA for DNA Reads](#bwa-for-dna-reads)
+    - [STAR for RNA Reads](#star-for-rna-reads)
+  - [Local Usage without Docker](#local-usage-without-docker)
+    - [Prerequisites](#prerequisites)
+    - [Obtain and Build XenoCP](#obtain-and-build-xenocp)
+    - [Inputs](#inputs)
+    - [Run](#run)
+  - [Local Usage with Docker](#local-usage-with-docker)
+    - [Build Docker image](#build-docker-image)
+    - [Run](#run-1)
+    - [Singularity as a Docker alternative](#singularity-as-a-docker-alternative)
+  - [WDL workflow](#wdl-workflow)
+    - [WDL reference files](#wdl-reference-files)
+    - [Running WDL](#running-wdl)
+  - [Evaluate test data results](#evaluate-test-data-results)
+  - [St. Jude Cloud](#st-jude-cloud)
+  - [Availability](#availability)
+  - [Seeking help](#seeking-help)
+  - [Citing XenoCP](#citing-xenocp)
+  - [Common Issues](#common-issues)
+
 XenoCP is a tool for cleansing mouse reads in xenograft BAMs.
 XenoCP can be easily incorporated into any workflow, as it takes a BAM file
 as input and efficiently cleans up the mouse contamination. The output is a clean
@@ -141,8 +166,8 @@ aligner: "bwa aln"
 For example, a prefix of `MGSCv37.fa` would assume for bwa alignment that
 the following files in the same directory exist: 
 `MGSCv37.fa.amb`, `MGSCv37.fa.ann`, `MGSCv37.fa.bwt`, 
-`MGSCv37.fa.pac`, and `MGSCv37.fa.sa`.
-For STAR alignment, `ref_db_prefix` should be a directory and 
+`MGSCv37.fa.pac`, and `MGSCv37.fa.sa`. `index` should be the path to that folder.
+For STAR alignment, `index` should be a directory and
 it would assume the following files exist in the directory: 
 `chrLength.txt`, `chrNameLength.txt`, `chrName.txt`, `chrStart.txt`, 
 `exonGeTrInfo.tab`, `exonInfo.tab`, `geneInfo.tab`, `Genome`,
@@ -195,10 +220,10 @@ $ docker build --tag xenocp .
 
 ### Run
 
-The Docker image uses `cwl-runner cwl/xenocp.cwl` as its entrypoint.
+The Docker image does not provide an entrypoint.
 
-The image assumes three working directories: `/data` for inputs, `/references` for
-reference files, and `/results` for outputs. `/data` and `/references` can be
+The image assumes three working directories: `/data` for inputs, `/reference` for
+reference files, and `/results` for outputs. `/data` and `/reference` can be
 read-only, where as `/results` needs write access.
 
 The paths given in the input parameters file must be from inside the
@@ -208,13 +233,16 @@ container, not the host, e.g.,
 bam:
   class: File
   path: /data/sample.bam
-ref_db_prefix: /reference/ref.fa
+ref_db_prefix: ref.fa
+index:
+  class: Directory
+  path: /reference
 aligner: "bwa aln"
 ```
 
-The following is an example `run` command where files are stored in `test/{data,reference}`. Outputs are saved in `test/results`.
+The following is an example `run` command where the data files are stored in the current directory under `sample_data/input_data`. Outputs are saved in `results` in the current directory. The path to the reference files on the host machine needs to be provided.
 
-This example assumes you are running against Mus musculus (genome build MGSCv37). Set the path to the folder containing your reference data
+This example assumes you are running against *Mus musculus* (genome build MGSCv37). Set the path to the folder containing your reference data
 and run the following command to produce output from the included sample data. Test output for comparison is located at `sample_data/output_data`.
 
 ```
@@ -223,7 +251,33 @@ $ docker run \
   --mount type=bind,source=$(pwd)/sample_data/input_data,target=/data,readonly \
   --mount type=bind,source=/path/to/reference,target=/reference,readonly \
   --mount type=bind,source=$(pwd)/results,target=/results \
-  xenocp \
+  ghcr.io/stjude/xenocp:latest \
+  cwl-runner \
+  --parallel \
+  --outdir results \
+  --no-container \
+  /opt/xenocp/cwl/xenocp.cwl \
+  /data/inputs.yml
+```
+
+### Singularity as a Docker alternative
+
+Singularity is an experimental container solution that is an HPC-friendly alternative to Docker. For many reasons, `singularity` is not a drop-in replacement for Docker. Many applications require modification to fully run with `singularity`. This alternative is provided on a best-effort basis. If issues are encountered, please open an issue on this repository with details and the maintainers will try to provide support as possible.
+
+```
+$ mkdir $(pwd)/results
+$ singularity run \
+  --containall \ # Isolate container from host
+  -W /path/to/directory \ # Provide a directory with sufficient space to use for working directory
+  -B $(pwd)/sample_data/input_data:/data \
+  -B /path/to/reference:/reference \
+  -B $(pwd)/results:/results \
+  docker://ghcr.io/stjude/xenocp:latest \
+  cwl-runner \
+  --parallel \
+  --outdir results \
+  --no-container \
+  /opt/xenocp/cwl/xenocp.cwl \
   /data/inputs.yml
 ```
 
@@ -232,7 +286,29 @@ default temporary file location, /tmp, is small. To solve this, include
 `-W <dir>` when executing via Singularity to redirect temp files to a
 larger directory `<dir>`.
 
+Note: By default, `singularity` makes many host resources available inside the container. This is in contrast with Docker's native isolation. This also tends to cause conflicts and errors when running Docker-based workflows. Therefore we recommend always using the `--containall` option to Singularity.
+
 [Dockerfile]: ./Dockerfile
+
+## WDL workflow
+
+XenoCP includes a [WDL](https://github.com/openwdl/wdl) workflow implementation. This can be run locally or on a supported HPC system. It can also use Docker or Singularity for containerization.
+
+### WDL reference files
+
+As of v1.2, WDL does not support directory inputs. Therefore the reference files provided to the WDL workflow must be compressed (`.tar.gz`) before running. The compressed reference files can be downloaded from [Zenodo](https://zenodo.org/uploads/10162103).
+
+### Running WDL
+
+To run the WDL workflow, you will need a WDL engine. We suggest [miniwdl](https://github.com/chanzuckerberg/miniwdl), though the [Cromwell](https://github.com/broadinstitute/cromwell/) engine should work, but is untested with XenoCP.
+
+After acquiring the reference files for your chosen aligner, you can run the sample data through the WDL workflow with the following command.
+
+```
+miniwdl run https://raw.githubusercontent.com/stjude/XenoCP/main/wdl/workflows/xenocp.wdl input_bam=https://github.com/stjude/XenoCP/raw/main/sample_data/input_data/SJRB001_X.subset.bam input_bai=https://github.com/stjude/XenoCP/raw/main/sample_data/input_data/SJRB001_X.subset.bam.bai reference_tar_gz=MGSCv37_bwa.tar.gz aligner='bwa aln'
+```
+
+This will run all of the steps on the local machine with Docker. The WDL runner `miniwdl` supports alternative execution modes, such as the [Singularity](https://miniwdl.readthedocs.io/en/latest/runner_backends.html#singularity-beta) container engine, [Slurm](https://github.com/miniwdl-ext/miniwdl-slurm) for batch systems, and [LSF](https://github.com/adthrasher/miniwdl-lsf) for batch systems. Alternative execution modes can be specified using `miniwdl`'s [configuration system](https://miniwdl.readthedocs.io/en/latest/runner_reference.html#configuration).
 
 ## Evaluate test data results
 

@@ -9,6 +9,8 @@ hints:
     packages:
       create_contam_list:
         specs: [ "java.sh org.stjude.compbio.xenocp.CreateContamLists" ]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 inputs:
   input_bam:

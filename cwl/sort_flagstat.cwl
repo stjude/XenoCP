@@ -18,6 +18,8 @@ hints:
       samtools:
         specs: ["samtools flagstat"]
         version: ["1.3.1"]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 inputs:
   input_bam:

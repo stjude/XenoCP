@@ -16,12 +16,14 @@ hints:
         specs: ["STAR"]
       tweak_sam:
         specs: ["java.sh org.stjude.compbio.sam.TweakSam"]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 inputs:
   ref_db_prefix: 
     type: string
     inputBinding:
-        position: 1
+        position: 4
   input_fastq:
     type: File
     inputBinding:
@@ -31,6 +33,10 @@ inputs:
     label: Must be an output bam file name, not an absolute path
     inputBinding:
         position: 3
+  index:
+    type: Directory
+    inputBinding:
+        position: 1
 
 outputs:
     bam:

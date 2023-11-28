@@ -9,6 +9,8 @@ hints:
     packages:
       SplitSam:
         specs: [ "SplitSam.java" ]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 inputs:
   suffix_length:
