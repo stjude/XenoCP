@@ -89,12 +89,12 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
             formal_name = %s and target_name = %s and project_name = %s and subproject = %s;"""
     stp_id = raptr.fetch_item_or_fail(query, (sample, target, project, subproject))
 
-    # Get loadables associated with old bam_tpl
+    # Get read groups associated with old bam_tpl
     query = """select bam_tpl_id, bam_id from bam_and_tpl where sample_target_project_id = %s
             and bam_status = 'Normal' and legacy = False"""
     (bam_tpl_id, bam_id) = raptr.fetch_row_or_fail(query, (stp_id,))
-    query = """select loadable_id from bam_tpl_loadable where bam_tpl_id = %s;"""
-    loadable_ids = raptr.fetch_col_or_fail(query, (bam_tpl_id,))
+    query = """select read_group_id from bam_tpl_read_group where bam_tpl_id = %s;"""
+    rg_ids = raptr.fetch_col_or_fail(query, (bam_tpl_id,))
 
     # Insert a new bam_tpl with qualifier 'xenocp'
     query = """insert into bam_tpl (bam_tpl_id, qualifier, status, sample_target_project_id)
@@ -102,9 +102,9 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     bam_tpl_id_xenocp = raptr.fetch_item_or_fail(query, (stp_id,))
 
     # Associate loadables with new bam_tpl.
-    query = """insert into bam_tpl_loadable values (%s, %s)"""
-    for lid in loadable_ids:
-        raptr.execute(query, (bam_tpl_id_xenocp, lid))
+    query = """insert into bam_tpl_read_group values (%s, %s)"""
+    for rgid in rg_ids:
+        raptr.execute(query, (bam_tpl_id_xenocp, rgid))
 
     # Get genome for old bam
     query = """select genome_id from bam where bam_id = %s;"""
@@ -124,12 +124,19 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     raptr.execute(query, (bam_id_xenocp, bam_tpl_id_xenocp))
 
     # Get read_group_ids and insert into bam_read_group
-    query = """SELECT read_group_id, pu from read_group inner join (select loadable_id as lid,
-            project_id as pid, project_name, subproject, target_name from loadable inner join
-            (select * from sample_target_project_view where
-            formal_name = %s and target_name = %s and project_name = %s
-            and subproject = %s) using (sample_target_id))
-            on loadable_id = lid and project_id = pid where status = 'Normal';"""
+    query = """select
+            rg.read_group_id,
+            rg.pu
+        from
+            read_group rg
+            inner join sample_target_project_view stpv
+                on rg.sample_target_id = stpv.sample_target_id and rg.project_id = stpv.project_id
+        where
+            status = 'Normal'
+            and formal_name = %s
+            and target_name = %s
+            and project_name = %s
+            and subproject = %s;"""
     res = raptr.execute_fetch(query, (sample, target, project, subproject))
     query = """insert into bam_read_group (bam_id, read_group_id, rgid)
             values (%s, %s, %s);"""
