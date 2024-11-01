@@ -111,7 +111,7 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     genome_id = raptr.fetch_item_or_fail(query, (bam_id,))
 
     # Get anls type named xenocp
-    query = """select anls_type_id from raptr.anls_type where name='%s'"""
+    query = """select anls_type_id from raptr.anls_type where name=%s"""
     anls_type_id = raptr.fetch_item_or_fail(query, ('xenocp',))
 
     # Add a new bam
