@@ -164,7 +164,7 @@ def add_bam_pair_bam_id(raptr, bam_id, **kwargs):
     """
     query = """select formal_name, target_name, project_name, subproject from sample_target_project_view inner join
             (select sample_target_project_id from bam_and_tpl where bam_id = %s and bam_status = 'Normal'
-            and legacy = false)
+            and legacy = false) bt
             using (sample_target_project_id);"""
     (sample, target, project, subproject) = raptr.fetch_row_or_fail(query, (bam_id,))
     add_bam_pair_stp(raptr, sample, target, project, subproject)
