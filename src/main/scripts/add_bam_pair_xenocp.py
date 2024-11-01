@@ -85,7 +85,7 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
         None
     """
     # Get stp ID
-    query = """select sample_target_project_id from sample_target_project_view where 
+    query = """select sample_target_project_id from sample_target_project_view where
             formal_name = %s and target_name = %s and project_name = %s and subproject = %s;"""
     stp_id = raptr.fetch_item_or_fail(query, (sample, target, project, subproject))
 
@@ -109,10 +109,16 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     # Get genome for old bam
     query = """select genome_id from bam where bam_id = %s;"""
     genome_id = raptr.fetch_item_or_fail(query, (bam_id,))
+
+    # Get anls type named xenocp
+    query = """select anls_type_id from raptr.anls_type where name='%s'"""
+    anls_type_id = raptr.fetch_item_or_fail(query, ('xenocp',))
+
     # Add a new bam
-    query = """insert into bam (bam_id, bam_tpl_id, status, notes, genome_id)
-            values (nextval('blt_id_seq'), %s, 'Normal', NULL, %s) returning bam_id;"""
-    bam_id_xenocp = raptr.fetch_item_or_fail(query, (bam_tpl_id_xenocp, genome_id))
+    query = """insert into bam (bam_id, bam_tpl_id, status, notes, genome_id, anls_type_id, source_bam_id)
+            values (nextval('blt_id_seq'), %s, 'Normal', NULL, %s, %s, %s) returning bam_id;"""
+    bam_id_xenocp = raptr.fetch_item_or_fail(query, (bam_tpl_id_xenocp, genome_id, anls_type_id, bam_id))
+
     # Update primary_bam_id of bam_tpl with the qualifier
     query = """update bam_tpl set primary_bam_id = %s where bam_tpl_id = %s;"""
     raptr.execute(query, (bam_id_xenocp, bam_tpl_id_xenocp))
@@ -157,7 +163,7 @@ def add_bam_pair_bam_id(raptr, bam_id, **kwargs):
         None
     """
     query = """select formal_name, target_name, project_name, subproject from sample_target_project_view inner join
-            (select sample_target_project_id from bam_and_tpl where bam_id = %s and bam_status = 'Normal' 
+            (select sample_target_project_id from bam_and_tpl where bam_id = %s and bam_status = 'Normal'
             and legacy = false)
             using (sample_target_project_id);"""
     (sample, target, project, subproject) = raptr.fetch_row_or_fail(query, (bam_id,))

@@ -7,6 +7,8 @@ hints:
     packages:
       bam_to_chr:
         specs: ["bam_to_chrs.sh"]
+  DockerRequirement:
+    dockerPull: "ghcr.io/stjude/xenocp:latest"
 
 baseCommand: bam_to_chrs.sh
 

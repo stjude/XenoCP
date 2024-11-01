@@ -20,24 +20,24 @@ distributions {
                 // Puts the compiled xenocp jar into lib
                 from jar
                 // Puts all of the compile dependencies into lib
-                from configurations.compile
+                from configurations.compileClasspath
             }
         }
     }
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
-    compile 'com.github.broadinstitute:picard:2.6.0'
-    compile 'commons-cli:commons-cli:1.2'
-    compile 'com.github.samtools:htsjdk:2.19.0'
+    implementation 'com.github.broadinstitute:picard:2.19.2'
+    implementation 'commons-cli:commons-cli:1.2'
+    implementation 'com.github.samtools:htsjdk:2.19.0'
 
-    compile files('dependencies/lib/java/xenocp-dependencies.jar')
+    implementation files('dependencies/lib/java/xenocp-dependencies.jar')
 
-    testCompile 'junit:junit:4.10'
+    testImplementation 'junit:junit:4.10'
 }
 
 group = 'org.stjude.compbio.xenocp'

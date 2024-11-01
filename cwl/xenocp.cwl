@@ -23,6 +23,8 @@ inputs:
       type: enum
       symbols: ["bwa aln", "bwa mem", "star"]
       name: aligner
+  index:
+    type: Directory
   # See doc in split_sam.cwl for the meaning of the following arguments
   suffix_length:
     type: int?
@@ -84,6 +86,7 @@ steps:
     in:
       aligner: aligner
       ref_db_prefix: ref_db_prefix
+      index: index
       input_fastq: mapped-fastq/fastq
       output_bam:
         valueFrom: $(inputs.input_fastq.nameroot).contam.bam
@@ -101,6 +104,7 @@ steps:
     in:
       aligner: aligner
       ref_db_prefix: ref_db_prefix
+      index: index
       input_fastq: mapped-fastq/fastq
       output_bam:
         valueFrom: $(inputs.input_fastq.nameroot).contam.bam
@@ -118,6 +122,7 @@ steps:
     in:
       aligner: aligner
       ref_db_prefix: ref_db_prefix
+      index: index
       input_fastq: mapped-fastq/fastq
       output_bam:
         valueFrom: $(inputs.input_fastq.nameroot).contam.bam
@@ -160,7 +165,7 @@ steps:
     out: [cleaned_bam]
 
   # Step05b: sort tie BAMs prior to merge
-  sort-bams:
+  sort_tie_bams:
     run: bio-cwl-tools:picard/picard_SortSam.cwl
     in:
       alignments: contamination/output_tie_bam
@@ -190,7 +195,7 @@ steps:
     run: merge_markdup_index.cwl
     in:
       input_bams:
-        source: [cleanse/cleaned_bam, split/unmapped]
+        source: sort_tie_bams/sorted_alignments
         linkMerge: merge_flattened
       output_bam:
         source: bam
