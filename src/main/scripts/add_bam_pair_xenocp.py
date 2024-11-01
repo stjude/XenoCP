@@ -102,7 +102,7 @@ def add_bam_pair_stp(raptr, sample, target, project, subproject, **kwargs):
     bam_tpl_id_xenocp = raptr.fetch_item_or_fail(query, (stp_id,))
 
     # Associate loadables with new bam_tpl.
-    query = """insert into bam_tpl_read_group values (%s, %s)"""
+    query = """insert into bam_tpl_read_group(bam_tpl_id, read_group_id) values (%s, %s)"""
     for rgid in rg_ids:
         raptr.execute(query, (bam_tpl_id_xenocp, rgid))
 
