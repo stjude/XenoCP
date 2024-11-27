@@ -93,9 +93,9 @@ workflow xenocp {
         call xenocp_tools.cleanse { input: input_bam=pair.left, unmap_reads=pair.right, stringency=validation_stringency }
     }
 
-    call xenocp_tools.merge_markdup_index as final_bam { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=output_name, skip_dup=skip_duplicate_marking }
+    call xenocp_tools.merge_markdup_index as merged_bam { input: input_bams=flatten([cleanse.cleaned_bam, [unmapped.unmapped_bam]]), output_bam=name+".tmp.bam", skip_dup=skip_duplicate_marking }
 
-    call xenocp_tools.qc { input: input_bam=final_bam.final_bam, input_bai=final_bam.final_bai, flagstat=final_bam.flagstat }
+    call xenocp_tools.qc { input: input_bam=merged_bam.final_bam, input_bai=merged_bam.final_bai, flagstat=merged_bam.flagstat }
 
     scatter(bam in create_contam_list.output_tie_bam){
         call picard.sort as tie_sort { input: bam=bam, sort_order="coordinate" }
@@ -105,11 +105,13 @@ workflow xenocp {
 
     call xenocp_tools.combine_files { input: input_files=create_contam_list.contam_list, output_file=name+".contam.txt" }
 
+    call xenocp_tools.finalize_bam as final_bam { input: input_bam=merged_bam.final_bam, output_file=output_name, reference_tar_gz=reference_tar_gz, aligner=aligner, original_bam_name=""+input_bam }
+
     output {
         File bam = final_bam.final_bam
         File bam_index = final_bam.final_bai
         File bam_md5 = final_bam.final_md5
-        File flagstat = final_bam.flagstat
+        File flagstat = merged_bam.flagstat
         File contam_list = combine_files.final_file
         File tie_bam = combine_tie_bam.final_bam
     }

@@ -16,7 +16,8 @@ RUN apt-get update \
 RUN pip3 install --ignore-installed \
         --prefix /usr/local \
         cwlref-runner \
-        html5lib
+        html5lib \
+        urllib3==1.26.15
 
 RUN cd /tmp \
     && wget https://github.com/lh3/bwa/releases/download/v0.7.17/bwa-0.7.17.tar.bz2 \
